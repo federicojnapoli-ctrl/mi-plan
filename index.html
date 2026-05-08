@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Plan Reset">
+<meta name="theme-color" content="#0d0d0d">
+<title>Plan Reset</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d0d;
+  --surface: #161616;
+  --surface2: #1e1e1e;
+  --surface3: #252525;
+  --lime: #c8f535;
+  --lime-dim: rgba(200,245,53,0.12);
+  --lime-border: rgba(200,245,53,0.25);
+  --orange: #ff7b3a;
+  --orange-dim: rgba(255,123,58,0.1);
+  --red: #ff4545;
+  --red-dim: rgba(255,69,69,0.08);
+  --text: #f0f0f0;
+  --text2: #aaa;
+  --muted: #555;
+  --border: #2a2a2a;
+  --nav-h: 68px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; overflow:hidden; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-width: 430px;
+  margin: 0 auto;
+  background: var(--bg);
+  position: relative;
+}
+
+/* HEADER */
+.app-header {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 18px;
+  padding-top: calc(14px + env(safe-area-inset-top, 0px));
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-left { display:flex; flex-direction:column; }
+.header-title { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: var(--lime); }
+.header-sub { font-size: 11px; color: var(--muted); letter-spacing: 1px; margin-top: 1px; }
+.header-badge {
+  background: var(--lime-dim);
+  border: 1px solid var(--lime-border);
+  color: var(--lime);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+
+/* BODY */
+.app-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* SCREENS */
+.screen { display:none; padding-bottom: calc(var(--nav-h) + 16px); }
+.screen.active { display:block; }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  padding-top: 8px;
+  z-index: 100;
+}
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.nav-icon { font-size: 20px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; border-radius:8px; transition: background 0.2s; }
+.nav-label { font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: 0.5px; transition: color 0.2s; }
+.nav-item.active .nav-icon { background: var(--lime-dim); }
+.nav-item.active .nav-label { color: var(--lime); }
+
+/* ══════════════════════
+   SHARED COMPONENTS
+══════════════════════ */
+.page-hero {
+  padding: 24px 18px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.page-eyebrow {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--lime);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.page-title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.1;
+  color: var(--text);
+}
+.page-title em { font-family: 'Lora', serif; font-style: italic; font-weight: 400; color: var(--lime); }
+.page-desc { font-size: 13px; color: var(--text2); margin-top: 8px; line-height: 1.6; font-family: 'Lora', serif; }
+
+.section-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 700;
+  padding: 20px 18px 10px;
+}
+
+.card {
+  margin: 0 18px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.card-head {
+  padding: 12px 16px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card-title { font-size: 14px; font-weight: 700; }
+.card-sub { font-size: 11px; color: var(--muted); margin-top: 2px; font-weight: 400; }
+.card-body { padding: 14px 16px; }
+
+.pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+.pill-lime { background: var(--lime-dim); color: var(--lime); border: 1px solid var(--lime-border); }
+.pill-orange { background: var(--orange-dim); color: var(--orange); }
+.pill-red { background: var(--red-dim); color: var(--red); }
+.pill-gray { background: var(--surface3); color: var(--text2); }
+
+/* ══════════════════════
+   SCREEN: HOME
+══════════════════════ */
+.home-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.home-stat {
+  background: var(--surface);
+  padding: 16px 10px;
+  text-align: center;
+}
+.home-stat-num {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--lime);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+.home-stat-label { font-size: 10px; color: var(--muted); margin-top: 4px; letter-spacing: 0.5px; }
+
+/* Semana visual */
+.week-strip {
+  display: flex;
+  gap: 6px;
+  padding: 0 18px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.week-strip::-webkit-scrollbar { display: none; }
+.week-day {
+  flex-shrink: 0;
+  width: 44px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.week-day-name {
+  background: var(--surface2);
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 5px 0;
+  letter-spacing: 1px;
+}
+.week-day-icon {
+  background: var(--surface);
+  text-align: center;
+  font-size: 18px;
+  padding: 8px 0;
+}
+.week-day.green .week-day-name { color: var(--lime); }
+.week-day.green .week-day-icon { background: var(--lime-dim); }
+.week-day.orange .week-day-name { color: var(--orange); }
+.week-day.orange .week-day-icon { background: var(--orange-dim); }
+
+/* Permitido box */
+.permitido-box {
+  margin: 0 18px 10px;
+  background: var(--surface);
+  border: 1.5px solid var(--orange);
+  border-radius: 14px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.permitido-box::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 80px; height: 80px;
+  background: radial-gradient(circle, rgba(255,123,58,0.15), transparent 70%);
+}
+.permitido-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--orange);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.permitido-rule {
+  font-size: 14px;
+  font-family: 'Lora', serif;
+  color: var(--text);
+  line-height: 1.6;
+}
+.permitido-rule strong { color: var(--orange); font-family: 'Syne', sans-serif; }
+
+/* Alert */
+.alert-box {
+  margin: 0 18px 10px;
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 13px;
+  font-family: 'Lora', serif;
+  line-height: 1.6;
+}
+.alert-box.lime {
+  background: var(--lime-dim);
+  border: 1px solid var(--lime-border);
+  color: #d0ec60;
+}
+.alert-box.red {
+  background: var(--red-dim);
+  border: 1px solid rgba(255,69,69,0.2);
+  color: #ff8080;
+}
+.alert-box strong { font-family: 'Syne', sans-serif; font-weight: 700; }
+
+/* ══════════════════════
+   SCREEN: MENÚ
+══════════════════════ */
+.day-scroller {
+  display: flex;
+  gap: 8px;
+  padding: 14px 18px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.day-scroller::-webkit-scrollbar { display: none; }
+.day-chip {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  transition: all 0.15s;
+}
+.day-chip.active { background: var(--lime); border-color: var(--lime); color: #0d0d0d; }
+.day-chip.permitido { border-color: var(--orange); color: var(--orange); }
+.day-chip.permitido.active { background: var(--orange); border-color: var(--orange); color: #fff; }
+
+.day-meals { padding: 14px 18px; display: none; flex-direction: column; gap: 10px; }
+.day-meals.active { display: flex; }
+
+.meal-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.meal-block.permitido-meal { border-color: rgba(255,123,58,0.4); }
+.meal-header {
+  padding: 9px 14px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.meal-type { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+.meal-body { padding: 12px 14px; }
+.meal-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.3px; }
+.meal-desc { font-size: 13px; color: var(--text2); line-height: 1.55; font-family: 'Lora', serif; }
+.meal-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 9px; }
+
+.permitido-banner {
+  background: var(--orange-dim);
+  border: 1px solid rgba(255,123,58,0.3);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 13px;
+  font-family: 'Lora', serif;
+  color: #ffb380;
+  line-height: 1.6;
+}
+.permitido-banner strong { font-family: 'Syne', sans-serif; color: var(--orange); }
+
+/* ══════════════════════
+   SCREEN: COMPRAS
+══════════════════════ */
+.shop-cat-block {
+  margin: 0 18px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.shop-cat-head {
+  padding: 10px 14px;
+  background: var(--surface2);
+  font-size: 13px;
+  font-weight: 700;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.shop-item {
+  padding: 11px 14px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--surface2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.shop-item:last-child { border-bottom: none; }
+.shop-item:active { background: var(--surface2); }
+.shop-item.checked { opacity: 0.35; }
+.shop-item.checked .item-name { text-decoration: line-through; }
+.item-name { flex: 1; }
+.item-qty { font-size: 12px; color: var(--muted); margin-right: 10px; }
+.item-check {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: transparent;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.shop-item.checked .item-check { background: var(--lime); border-color: var(--lime); color: #0d0d0d; }
+.shop-reset-btn {
+  margin: 4px 18px 16px;
+  width: calc(100% - 36px);
+  padding: 13px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+/* ══════════════════════
+   SCREEN: EJERCICIO
+══════════════════════ */
+.ex-card {
+  margin: 0 18px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.ex-head {
+  padding: 12px 14px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ex-title { font-size: 14px; font-weight: 700; }
+.ex-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.ex-list { padding: 6px 0; }
+.ex-item {
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  border-bottom: 1px solid var(--surface2);
+}
+.ex-item:last-child { border-bottom: none; }
+.ex-sets { font-size: 11px; font-weight: 700; color: var(--lime); background: var(--lime-dim); padding: 3px 10px; border-radius: 20px; }
+
+/* ══════════════════════
+   SCREEN: CONSEJOS
+══════════════════════ */
+.tip-card {
+  margin: 0 18px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+.tip-icon { font-size: 28px; margin-bottom: 10px; }
+.tip-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: var(--lime); }
+.tip-body { font-size: 13px; color: var(--text2); line-height: 1.6; font-family: 'Lora', serif; }
+
+.snack-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0 18px 10px;
+}
+.snack-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 13px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-family: 'Lora', serif;
+}
+.snack-emoji { font-size: 20px; flex-shrink: 0; }
+</style>
+
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAFeElEQVR4nO3dO3JUVxSF4a0uh4o1CMU9DMoTcKIAFZnLkcuMAJcDyuVUBCSegIthdBFqEIrJ5UC+uNWve177PNb5vwzM4wZ/LTa3AV9ZBTf32+caP4+yv//6dPG///Tz20pPku7pYXfl/XP84PGDEnA5ayGP5LALj8CL/oCEXFZozCOs8yUlw85eaCJGrv2GcuPelHoQlDXLOh/KbSppoQnZl9LdnGLpK2WtoxeamH3NHvO+lNaigiZmX7Exq50bp8Q2Fxw0Mftimc+LaS8oaGL2RczrQhtcDZqYfaXGPMO5cSikxYtBEzN6s9bk2aCJ2R/rnOZSmyeDJmZ/3M15zjWa9Ukh6pt9ndccBc06+2OdyzjV6mbtG6AfrPOxw2Y5OSpjnX0R9CBY5zDfg+bc8Mc6+9hvl4UeAOscbmPGOtfAOvtaGmahIYWgO8e5EYegIWXD/dwv1jnOzf32mYWGFILuFOuchqAhhaA7xDqnI2hIIejOsM55CBpSCLojPa7z9d1t60eI4vIPnmM8l8K9vru1b58fKz5NOoLuRKt1Hm2B1xD0hNQi3kfQk8iJeJRzw4ygu+B1bigv8TkELahkyCOtsxlBN1dqnT3WeLSYzQh6eF5nxYgxmxF0Uznr7HkfjxqzGZ8UDomYzxsq6O37N60foZiUdb6+uyXmFcOcHEvM+1HvPnxp9ThV1Xj9phCz2UBBn6Ied633yCoxmw10cqwFu33/ZpiTJOTcIOY0Qy/0KaOvds1P99RiNhtooc1eAo2JdKTVNiPmEoYKehG7vD2Fferc8H57cUg1ZrNBgzZLOyd6CntR+w8QKcdsNvgNvfvwJSnQ5fu0vLEJ2cewC73IiXJZ7NqrTcx+hg/arMzS1gj73dePxOxMImizcudDj3d2qtliNhMK2qzsTTx61DPGbCYWtFn5qEcL+9vnx2ljNhMM2qz824tRwp455IVk0GbxnyqG6DlsYn4hG/TC411zb1ET8//kgzbTXmtifm2KoBdqa03Mx6YK2swv6tphE/Np0wVt5vdnOGpFTcznTRm0mc9dbea/1sR82bRBL0Zaa2JeN33QZmNETcxhCPo/nlHnhk3M4Qh6T49/qZaY4xD0gZ6iJuZ4Q/8VLC9L1K0+NCHkdCz0BS3WmpjzEPSKmlETcz6CDlAjamIug6ADeUZNzOUQdASPqIm5LIKO1NNrPRwj6ASlomadyyPoRLlRE7MPgs6QGjUx+yHoTNzUfSHoAmKiZp19EXQhIVETsz+CLojzoz2CLoyo2yJoB0TdDkE7OYz63dePjZ5kLgTtiKWuj6CdEXVdBF0BUddD0JBC0JBC0JBC0JBC0JDCPzTj5Jc/fnv15U+P/xx93Z+//l7zkabAQlfy9vbH1o8wBYKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGFIKGlKub++1z64cASmGhIYWgIYWgIYWgIYWgIYWgIYWgIYWgIYWgIYWgIYWgIYWgIYWgIYWgIYWgIYWgIYWgIYWgIYWgIYWgIYWgIYWgIYWgIYWgIWXz9LC7av0QQAlPD7srFhpSCBpSCBpSNmYvt0frBwFyLA2z0JDyPWhWGqPab5eFhhSChpRXQXN2YDSHzR4tNFFjFKda5eSAlJNBs9Lo3blGzy40UaNXl9q8eHIQNXqz1uTqDU3U6EVIi0G/KSRqtBbaYPBbDqJGKzHtRb22I2rUFttc9HtookYtKa1lxcn/+B4eckYz65NC1hql5TZVNEgWGylKDqPLwhI2Qnj8Cl/lZCBwmNU5Uf8FaQTuavl1FhsAAAAASUVORK5CYII=">
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<script>
+// Inject PWA manifest dynamically
+(function(){
+  var manifestData = "{\"name\": \"Plan Reset\", \"short_name\": \"Plan Reset\", \"description\": \"Tu plan saludable personalizado\", \"start_url\": \".\", \"display\": \"standalone\", \"background_color\": \"#0d0d0d\", \"theme_color\": \"#0d0d0d\", \"orientation\": \"portrait\", \"icons\": [{\"src\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAF8klEQVR4nO3dPW5bRxiF4UPBpWstQjWXYWQDaVxYcBekCuIVJEhhBGnlwk02EGQZgkstQrV7pVAoUOQlee+dn29mzvt0cZCYxXnnDik62aii69vtU83fz8Xff305+/d//OlDpVeSx+Pd/abW7/Wm5L+cwZd1afi9OtxNySCyB8Do6xh1/FP2N5U7hmwBMPw29Xb9uWS3s1whJAfA8OtzOv1PyRXCVY4XgXoY/2upG1z1BGD4MRj/tJSnweInAOOPsWb8o93/L1mzzUUBMH60bulGZwfA+ONw+i+zZKuzAmD8cbj3rzN3sxcDYPxx1o7f+fTfN2e7ZwNg/OjdpQ2fDIDxx+L0z+fclpN+EIYyuPfXMxkAp3+fOP1PO7XpowAYfyxO/3Kmts0VqCEp4+f0X+dVAJz+GN3hxnkCNILTP8ZLAJz+cLG/dZ4ADeD0j0MAsHYlcf2JxMeeMXab5wnQMa4/6QgA1gigU5z+eVxx/4er69vtE08AWCOADnH9yYcAYI0AYI0AOsP1Jy8CgDUC6Ainf34EAGtF/xdJyKe10//t+5ujX/v+9SHglaQhAMwyNfgREEAHap/+o459CgHgRcrwe7z+SAQAeZ34hwigcSWvP7mG3+vpLxGApZwnfs/jlwigaTlP/xLXnN7HLxHA8Erd70cYv0QAzUo9/Uu+sR1l/BIBDKf0JzojjV/q+LtA20/vol9CMWtO/7fvbxj/Cl0+AXbj34/g/rd/o15OqFqf4Y84fqnTAKYcPhFGD6LmD69GHb/U6RVozri3n951eU2ac/1h/PkM8wQ4ZaRrUu2vLIw+fqnTJ4D0POalg+71qSAx/lK6DWBnzaneaghT158an+4cchm/NEAA0vqrTash7ER8S9Np/NIgAUhp9/sWQtg//SNOfclv/NJAAUjpb3KjI5DivpvvOH5psACkPBFEhcD46xsuACnPx501Q/j47TPjDzJkANK6j0mntPD+oBT38UsDB7CT64dfo4XA+J8NH4CU9yfAvYfw/esD499jEYCU/2sQPYbA8I/ZBCCV+S5QLyEw/mlWAUjlvhDXcgSM/zS7AKSyEbQWAuM/zzIAqexXo1uJgPFfZhuAVD6CyBAY/zzWAUjl/5BM7Qj4mHMZ+wCkOhHUCIHhL0cA/8v11YlzSkbA+NchgAM9RsD41yOACT1FwPjTEMAJPbwvYPzpCOCMlv8zKow/DwK4oMab46UYfz4EMFMrETD+vAhggegIGH9+BLBQ1JWI8ZdBACvVjIDxl0MACWpEwPjLIoBEJSNg/OURQAYlImD8dRBAJjkjYPz1EEBG0R+TYjkCyCw1Ak7/ugiggLURMP76CKCQpREw/hgEUNDcCBh/HAIojDfGbSOACoigXQRQCRG0iQAqIoL2EEBlhxF8/PY56JVAIoAQPAnaQQBBiKANBBCICOIRAKwRAKwRAKwRAKwRAKwRAKy9iX4Bbn7+49dXf/3l4Z+jX/vzl99rviRrPAGCfbj5IfolWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWCMAWNtc326fol8EEIUnAKwRAKwRAKwRAKwRAKwRAKwRAKwRAKwRAKwRAKwRAKwRAKwRAKwRAKwRAKwRAKwRAKwRAKwRAKwRAKwRAKwRAKwRAKwRAKwRAKxdPd7db6JfBBDh8e5+wxMA1ggA1ggA1q6k57tQ9AsBatptnicArBEArL0EwDUILva3zhMA1l4FwFMAozvcOE8AWDsKgKcARjW17cknABFgNKc2zRUI1k4GwFMAozi35bNPACJA7y5t+OIViAjQqznbnfUegAjQm7mbnf0mmAjQiyVbXfQpEBGgdUs3uvhjUCJAq9ZsM2nM17fbp5R/Hsgh5VBO+kEYTwNES91gtgHzNEBNuQ7f7Cc4IaCk3LeOolcYYkAOJa/aVe/wBIE5ar63/A+bPBCnTjcyPwAAAABJRU5ErkJggg==\", \"sizes\": \"192x192\", \"type\": \"image/png\"}, {\"src\": \"data:image/png;base64,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\", \"sizes\": \"512x512\", \"type\": \"image/png\", \"purpose\": \"any maskable\"}]}";
+  var blob = new Blob([manifestData], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var link = document.createElement('link');
+  link.rel = 'manifest';
+  link.href = url;
+  document.head.appendChild(link);
+})();
+</script>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="app-header">
+    <div class="header-left">
+      <div class="header-title">PLAN RESET</div>
+      <div class="header-sub">PARA BAJAR PESO · CON ENERGÍA</div>
+    </div>
+    <div class="header-badge">1–2 MESES</div>
+  </div>
+
+  <div class="app-body">
+
+    <!-- ══ HOME ══ -->
+    <div class="screen active" id="screen-home">
+      <div class="page-hero">
+        <div class="page-eyebrow">Tu situación</div>
+        <div class="page-title">El plan que<br><em>realmente</em> funciona</div>
+        <div class="page-desc">5 días limpios + 2 permitidos estructurados. No libres. No "lo que quieras". Estructurados — para ver resultados reales en 1 a 2 meses.</div>
+      </div>
+
+      <div class="home-stats">
+        <div class="home-stat">
+          <div class="home-stat-num">5</div>
+          <div class="home-stat-label">Días limpios</div>
+        </div>
+        <div class="home-stat">
+          <div class="home-stat-num">2</div>
+          <div class="home-stat-label">Permitidos</div>
+        </div>
+        <div class="home-stat">
+          <div class="home-stat-num">-8kg</div>
+          <div class="home-stat-label">Objetivo 2 meses</div>
+        </div>
+      </div>
+
+      <div class="section-label">La semana de un vistazo</div>
+      <div class="week-strip">
+        <div class="week-day green"><div class="week-day-name">LUN</div><div class="week-day-icon">✅</div></div>
+        <div class="week-day green"><div class="week-day-name">MAR</div><div class="week-day-icon">✅</div></div>
+        <div class="week-day green"><div class="week-day-name">MIÉ</div><div class="week-day-icon">✅</div></div>
+        <div class="week-day green"><div class="week-day-name">JUE</div><div class="week-day-icon">✅</div></div>
+        <div class="week-day green"><div class="week-day-name">VIE</div><div class="week-day-icon">✅</div></div>
+        <div class="week-day orange"><div class="week-day-name">SÁB</div><div class="week-day-icon">🟠</div></div>
+        <div class="week-day green"><div class="week-day-name">DOM</div><div class="week-day-icon">✅</div></div>
+      </div>
+      <div style="padding: 6px 18px 0; font-size:11px; color:var(--muted); font-family:'Lora',serif;">✅ Días limpios &nbsp;·&nbsp; 🟠 Permitido estructurado</div>
+
+      <div class="section-label">El sistema de permitidos</div>
+      <div class="permitido-box">
+        <div class="permitido-title">🟠 Regla del permitido</div>
+        <div class="permitido-rule">
+          El permitido es el <strong>sábado al mediodía</strong> únicamente. Una comida — no un día entero.<br><br>
+          Podés comer lo que quieras en esa comida. Después de esa comida, <strong>terminó el permitido</strong>. La cena del sábado ya es limpia. El domingo arrancás normal.<br><br>
+          Esto corta el ciclo de "ya la arruiné, sigo mañana."
+        </div>
+      </div>
+
+      <div class="alert-box lime">
+        <strong>¿Por qué uno solo y no dos?</strong> Dijiste que el permitido se convierte en varios días. Con dos permitidos semanales el riesgo de que se extienda es muy alto. Arrancamos con uno. En 4-6 semanas, cuando el hábito esté instalado, podés agregar un segundo.
+      </div>
+
+      <div class="section-label">Qué esperar mes a mes</div>
+      <div class="card">
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;padding:16px;">
+          <div style="display:flex;gap:14px;align-items:flex-start;">
+            <div style="font-size:22px;font-weight:800;color:var(--lime);min-width:36px;font-family:'Syne',sans-serif;line-height:1;">SEM<br>1–2</div>
+            <div style="font-size:13px;color:var(--text2);font-family:'Lora',serif;line-height:1.6;">El cuerpo se adapta. Posible algo de cansancio los primeros días. Bajás 1–3 kg principalmente de líquido. Los antojos de azúcar empiezan a reducirse.</div>
+          </div>
+          <div style="border-top:1px solid var(--border);"></div>
+          <div style="display:flex;gap:14px;align-items:flex-start;">
+            <div style="font-size:22px;font-weight:800;color:var(--lime);min-width:36px;font-family:'Syne',sans-serif;line-height:1;">SEM<br>3–4</div>
+            <div style="font-size:13px;color:var(--text2);font-family:'Lora',serif;line-height:1.6;">Energía más estable. Menos hambre entre comidas. El hábito empieza a instalarse. Bajás 0.5–1 kg por semana de grasa real.</div>
+          </div>
+          <div style="border-top:1px solid var(--border);"></div>
+          <div style="display:flex;gap:14px;align-items:flex-start;">
+            <div style="font-size:22px;font-weight:800;color:var(--lime);min-width:36px;font-family:'Syne',sans-serif;line-height:1;">MES<br>2</div>
+            <div style="font-size:13px;color:var(--text2);font-family:'Lora',serif;line-height:1.6;">Diferencia visible en el espejo y en la ropa. Más energía para ejercitarte. Podés agregar un segundo permitido estructurado si el primero ya no te descontrola.</div>
+          </div>
+          <div style="background:var(--lime-dim);border:1px solid var(--lime-border);border-radius:8px;padding:10px 12px;font-size:13px;color:#d0ec60;font-family:'Lora',serif;line-height:1.5;">
+            A este ritmo: <strong style="font-family:'Syne',sans-serif;">-6 a -8 kg en 2 meses</strong> es un objetivo realista y sostenible.
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label">La clave de la energía</div>
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Por qué estás cansado</div>
+            <div class="card-sub">Y cómo el plan lo resuelve</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="font-size:13px;color:var(--text2);font-family:'Lora',serif;line-height:1.6;">
+              🍬 <strong style="color:var(--text);font-family:'Syne',sans-serif;">Pico de azúcar → bajón:</strong> Las galletitas y snacks dulces te dan energía 20 minutos y después te dejan más cansado que antes.
+            </div>
+            <div style="font-size:13px;color:var(--text2);font-family:'Lora',serif;line-height:1.6;">
+              💧 <strong style="color:var(--text);font-family:'Syne',sans-serif;">Deshidratación:</strong> Con menos de 2 litros de agua, el cansancio se multiplica.
+            </div>
+            <div style="font-size:13px;color:var(--text2);font-family:'Lora',serif;line-height:1.6;">
+              🥩 <strong style="color:var(--text);font-family:'Syne',sans-serif;">Poca proteína:</strong> Sin suficiente proteína en cada comida, el cuerpo no tiene combustible estable.
+            </div>
+            <div style="background:var(--lime-dim);border:1px solid var(--lime-border);border-radius:8px;padding:10px 12px;font-size:13px;color:#d0ec60;font-family:'Lora',serif;line-height:1.5;">
+              Este plan prioriza proteína + vegetales + carbos moderados. En 5-7 días la energía sube notablemente.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MENÚ ══ -->
+    <div class="screen" id="screen-menu">
+      <div class="page-hero">
+        <div class="page-eyebrow">Semana tipo</div>
+        <div class="page-title">Menú<br><em>semanal</em></div>
+        <div class="page-desc">5 días limpios y saciantes. 1 permitido el sábado al mediodía.</div>
+      </div>
+
+      <div class="day-scroller">
+        <div class="day-chip active" onclick="showDay('lun',this)">LUN</div>
+        <div class="day-chip" onclick="showDay('mar',this)">MAR</div>
+        <div class="day-chip" onclick="showDay('mie',this)">MIÉ</div>
+        <div class="day-chip" onclick="showDay('jue',this)">JUE</div>
+        <div class="day-chip" onclick="showDay('vie',this)">VIE</div>
+        <div class="day-chip permitido" onclick="showDay('sab',this)">SÁB 🟠</div>
+        <div class="day-chip" onclick="showDay('dom',this)">DOM</div>
+      </div>
+
+      <!-- LUNES -->
+      <div class="day-meals active" id="meals-lun">
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Desayuno</span><span class="pill pill-lime">⏱ 7 min</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Huevos revueltos + tostada integral</div>
+            <div class="meal-desc">3 huevos + 1 tostada integral + café negro o con leche sin azúcar. Proteína desde el principio = energía todo el día.</div>
+          </div>
+        </div>
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Almuerzo</span><span class="pill pill-lime">⏱ 15 min</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Pollo a la plancha con arroz y ensalada</div>
+            <div class="meal-desc">150g pechuga + ½ taza arroz + ensalada grande (lechuga, tomate, zanahoria) + aceite de oliva. Plato completo sin hambre en 2 horas.</div>
+            <div class="meal-tags"><span class="pill pill-gray">½ plato verdura</span></div>
+          </div>
+        </div>
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Merienda</span><span class="pill pill-gray">Si tenés hambre</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Fruta + nueces</div>
+            <div class="meal-desc">1 manzana o banana + puñado de nueces. Si no tenés hambre, no comés.</div>
+          </div>
+        </div>
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Cena</span><span class="pill pill-lime">⏱ 10 min</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Omelette con vegetales</div>
+            <div class="meal-desc">3 huevos + espinaca + queso + tomate cherry. Cena liviana = mejor sueño = más energía mañana.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MARTES -->
+      <div class="day-meals" id="meals-mar">
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Desayuno</span><span class="pill pill-lime">⏱ 5 min</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Avena con banana y canela</div>
+            <div class="meal-desc">½ taza avena + leche + banana + canela. Saciante por 4 horas. Cero tentación a media mañana.</div>
+          </div>
+        </div>
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Almuerzo</span><span class="pill pill-lime">⏱ 8 min</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Ensalada completa con atún</div>
+            <div class="meal-desc">Lechuga + tomate + pepino + atún al natural + huevo duro + aceite de oliva + limón. Pan integral al lado si querés.</div>
+            <div class="meal-tags"><span class="pill pill-gray">½ plato verdura</span></div>
+          </div>
+        </div>
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Cena</span><span class="pill pill-lime">⏱ 15 min</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Pasta integral con tuco de carne</div>
+            <div class="meal-desc">Pasta integral + salsa de tomate natural + carne picada magra. Porción moderada — llenate de la ensalada primero.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MIÉRCOLES -->
+      <div class="day-meals" id="meals-mie">
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Desayuno</span><span class="pill pill-lime">⏱ 5 min</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Yogur griego con fruta</div>
+            <div class="meal-desc">150g yogur griego entero + fruta picada + opcional una cucharada de granola sin azúcar.</div>
+          </div>
+        </div>
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Almuerzo</span><span class="pill pill-lime">⏱ 20 min</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Milanesa al horno con ensalada</div>
+            <div class="meal-desc">Milanesa de pollo al horno (no frita) + ensalada mixta grande. Podés hacer 3 milanesas juntas y guardar para mañana.</div>
+            <div class="meal-tags"><span class="pill pill-gray">Prep adelantado</span></div>
+          </div>
+        </div>
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Cena</span><span class="pill pill-lime">⏱ 10 min</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Sopa de verduras + huevo</div>
+            <div class="meal-desc">Sopa liviana de verduras + 2 huevos duros aparte. Cena muy liviana — el miércoles es ideal para la más liviana de la semana.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JUEVES -->
+      <div class="day-meals" id="meals-jue">
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Desayuno</span><span class="pill pill-lime">⏱ 8 min</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Tostadas con palta y huevo</div>
+            <div class="meal-desc">2 tostadas integrales + ½ palta + 1 huevo frito o pochado + sal + pimienta.</div>
+          </div>
+        </div>
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Almuerzo</span><span class="pill pill-lime">⏱ 10 min</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Milanesa guardada + ensalada</div>
+            <div class="meal-desc">La milanesa del miércoles + ensalada nueva. Cocinar una vez, comer dos veces.</div>
+            <div class="meal-tags"><span class="pill pill-lime">Cero trabajo hoy</span></div>
+          </div>
+        </div>
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Cena</span><span class="pill pill-lime">⏱ 5 min</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Tabla rápida</div>
+            <div class="meal-desc">Jamón + queso + aceitunas + huevos duros + tostadas. Para cuando llegás cansado y sin ganas de cocinar.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIERNES -->
+      <div class="day-meals" id="meals-vie">
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Desayuno</span><span class="pill pill-lime">⏱ 7 min</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Huevos + tostada</div>
+            <div class="meal-desc">El viernes arrancás fuerte — mañana es el permitido, no hoy. 3 huevos + 1 tostada + café.</div>
+          </div>
+        </div>
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Almuerzo</span><span class="pill pill-lime">⏱ 15 min</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Bife o hamburguesa casera + ensalada</div>
+            <div class="meal-desc">200g carne a la plancha + ensalada grande. Viernes = comida sabrosa pero limpia. El gusto del fin de semana empieza mañana.</div>
+          </div>
+        </div>
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Cena</span><span class="pill pill-orange">Pre-permitido</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Cena muy liviana</div>
+            <div class="meal-desc">Yogur + fruta, o una ensalada simple. Mañana es el permitido — llegá al sábado sin estar inflado.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SÁBADO — PERMITIDO -->
+      <div class="day-meals" id="meals-sab">
+        <div class="permitido-banner">
+          <strong>🟠 DÍA DE PERMITIDO</strong><br>
+          El permitido es el almuerzo únicamente. Comé lo que quieras, disfrutalo. Después de esa comida, el permitido terminó. La cena del sábado ya es limpia. Esto no es castigo — es el sistema que evita que un permitido se convierta en 4 días.
+        </div>
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Desayuno</span><span class="pill pill-lime">Limpio</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Desayuno normal</div>
+            <div class="meal-desc">Avena, huevos o yogur. No arranques el día con el "modo permitido" — empezá después del almuerzo.</div>
+          </div>
+        </div>
+        <div class="meal-block permitido-meal">
+          <div class="meal-header"><span class="meal-type">Almuerzo</span><span class="pill pill-orange">🟠 PERMITIDO</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Lo que quieras</div>
+            <div class="meal-desc">Pizza, asado con pan, empanadas, lo que tengas ganas. Disfrutalo sin culpa. Esta es la comida libre de la semana.</div>
+          </div>
+        </div>
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Cena</span><span class="pill pill-lime">Volvés</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Cena liviana — el permitido terminó</div>
+            <div class="meal-desc">Ensalada con proteína, sopa, o tabla. Esta comida marca el "switch" de vuelta al modo limpio. Es el momento más importante de la semana.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOMINGO -->
+      <div class="day-meals" id="meals-dom">
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Desayuno</span><span class="pill pill-lime">Vuelta al ritmo</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Avena o huevos — domingo normal</div>
+            <div class="meal-desc">El domingo arrancás como lunes. El permitido del sábado ya quedó atrás. No lo extendas.</div>
+          </div>
+        </div>
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Almuerzo + Prep</span><span class="pill pill-gray">30 min</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Meal prep semanal</div>
+            <div class="meal-desc">Cocinás arroz en cantidad, hervís 6 huevos, dejás pollo condimentado. 30 minutos = toda la semana sin excusas de tiempo.</div>
+            <div class="meal-tags"><span class="pill pill-lime">Clave anti-recaída</span></div>
+          </div>
+        </div>
+        <div class="meal-block">
+          <div class="meal-header"><span class="meal-type">Cena</span><span class="pill pill-lime">⏱ 25 min</span></div>
+          <div class="meal-body">
+            <div class="meal-name">Guiso de lentejas o porotos</div>
+            <div class="meal-desc">Rinde 2-3 porciones, nutritivo, saciante y económico. Dejás para el lunes también.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ COMPRAS ══ -->
+    <div class="screen" id="screen-shop">
+      <div class="page-hero">
+        <div class="page-eyebrow">Supermercado</div>
+        <div class="page-title">Lista de<br><em>compras</em></div>
+        <div class="page-desc">Tocá para tachar. Se guarda aunque cierres la app.</div>
+      </div>
+      <div id="shop-categories"></div>
+      <button class="shop-reset-btn" onclick="resetShop()">↺ Nueva semana — reiniciar lista</button>
+    </div>
+
+    <!-- ══ EJERCICIO ══ -->
+    <div class="screen" id="screen-ex">
+      <div class="page-hero">
+        <div class="page-eyebrow">Movimiento</div>
+        <div class="page-title">3 días,<br><em>25 minutos</em></div>
+        <div class="page-desc">Mancuernas + calistenia. Sin gym. Sin hora completa. Lo que podés sostener.</div>
+      </div>
+
+      <div class="alert-box lime">
+        <strong>Prioridad #1:</strong> Caminá 30 minutos todos los días. Antes de cualquier rutina. La caminata baja el cortisol (estrés) que es tu principal causa de comer de más.
+      </div>
+
+      <div class="section-label">Rutina A — Lunes</div>
+      <div class="ex-card">
+        <div class="ex-head">
+          <div><div class="ex-title">Pecho · Hombros · Tríceps</div><div class="ex-sub">Tren superior</div></div>
+          <span class="pill pill-lime">25 min</span>
+        </div>
+        <div class="ex-list">
+          <div class="ex-item">Flexiones de piso <span class="ex-sets">4×12</span></div>
+          <div class="ex-item">Press mancuernas (en piso) <span class="ex-sets">3×10</span></div>
+          <div class="ex-item">Press de hombros <span class="ex-sets">3×10</span></div>
+          <div class="ex-item">Elevaciones laterales <span class="ex-sets">3×12</span></div>
+          <div class="ex-item">Extensión tríceps <span class="ex-sets">3×12</span></div>
+          <div class="ex-item">Plancha <span class="ex-sets">3×30s</span></div>
+        </div>
+      </div>
+
+      <div class="section-label">Rutina B — Miércoles</div>
+      <div class="ex-card">
+        <div class="ex-head">
+          <div><div class="ex-title">Espalda · Bíceps · Core</div><div class="ex-sub">Tren medio</div></div>
+          <span class="pill pill-lime">25 min</span>
+        </div>
+        <div class="ex-list">
+          <div class="ex-item">Remo a una mano <span class="ex-sets">4×10 c/lado</span></div>
+          <div class="ex-item">Curl de bíceps <span class="ex-sets">3×12</span></div>
+          <div class="ex-item">Remo inclinado <span class="ex-sets">3×10</span></div>
+          <div class="ex-item">Superman en piso <span class="ex-sets">3×15</span></div>
+          <div class="ex-item">Abdominales bicicleta <span class="ex-sets">3×20</span></div>
+          <div class="ex-item">Plancha lateral <span class="ex-sets">3×20s c/lado</span></div>
+        </div>
+      </div>
+
+      <div class="section-label">Rutina C — Viernes</div>
+      <div class="ex-card">
+        <div class="ex-head">
+          <div><div class="ex-title">Piernas · Glúteos · Full body</div><div class="ex-sub">Tren inferior</div></div>
+          <span class="pill pill-lime">25 min</span>
+        </div>
+        <div class="ex-list">
+          <div class="ex-item">Sentadillas c/mancuernas <span class="ex-sets">4×15</span></div>
+          <div class="ex-item">Estocadas alternas <span class="ex-sets">3×12 c/lado</span></div>
+          <div class="ex-item">Peso muerto rumano <span class="ex-sets">3×12</span></div>
+          <div class="ex-item">Puente de glúteo <span class="ex-sets">3×15</span></div>
+          <div class="ex-item">Burpees <span class="ex-sets">3×8</span></div>
+          <div class="ex-item">Mountain climbers <span class="ex-sets">3×20s</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CONSEJOS ══ -->
+    <div class="screen" id="screen-tips">
+      <div class="page-hero">
+        <div class="page-eyebrow">Anti-recaída</div>
+        <div class="page-title">Cuando el<br><em>plan tambalea</em></div>
+        <div class="page-desc">Estrategias específicas para tu patrón de comportamiento.</div>
+      </div>
+
+      <div class="section-label">El ciclo que queremos romper</div>
+      <div class="alert-box red">
+        <strong>Tu ciclo actual:</strong> Antojo → galletitas → "ya la arruiné" → varios días fuera del plan → culpa → intentar de nuevo. Este plan corta el ciclo en el punto 2: reemplazar las galletitas por snacks que no disparen el "ya la arruiné".
+      </div>
+
+      <div class="section-label">Snacks anti-recaída (siempre a mano)</div>
+      <div class="snack-grid">
+        <div class="snack-item"><span class="snack-emoji">🍎</span>Fruta entera</div>
+        <div class="snack-item"><span class="snack-emoji">🥜</span>Nueces o almendras</div>
+        <div class="snack-item"><span class="snack-emoji">🧀</span>Queso en cubos</div>
+        <div class="snack-item"><span class="snack-emoji">🍫</span>Chocolate 70%+</div>
+        <div class="snack-item"><span class="snack-emoji">🥛</span>Yogur griego</div>
+        <div class="snack-item"><span class="snack-emoji">🥚</span>Huevo duro</div>
+        <div class="snack-item"><span class="snack-emoji">🫒</span>Aceitunas</div>
+        <div class="snack-item"><span class="snack-emoji">🍌</span>Banana + maní</div>
+      </div>
+
+      <div class="section-label">Reglas de oro</div>
+      <div class="tip-card">
+        <div class="tip-icon">🚫</div>
+        <div class="tip-title">No compres galletitas</div>
+        <div class="tip-body">La fuerza de voluntad falla siempre. Si no están en casa, no las comés. Reemplazalas en el supermercado por nueces y chocolate amargo. Mismo ritual, sin el bajón de azúcar.</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">💧</div>
+        <div class="tip-title">2 litros de agua por día</div>
+        <div class="tip-body">El 40% de los "antojos" son sed. Antes de comer algo entre comidas, tomá un vaso de agua y esperá 10 minutos. Si sigue el hambre, comés. Si no, era sed.</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">🔁</div>
+        <div class="tip-title">Una comida no arruina nada</div>
+        <div class="tip-body">Si comés galletitas un martes, la siguiente comida es limpia. No existe "ya la arruiné". El problema es el día 2, 3 y 4 fuera del plan. Una comida no es nada.</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">🟠</div>
+        <div class="tip-title">El permitido termina con la comida</div>
+        <div class="tip-body">La cena del sábado ya es limpia. No "ya que estoy". Esto es el punto más importante del plan. Practicarlo las primeras semanas es difícil — después es automático.</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">📦</div>
+        <div class="tip-title">Meal prep del domingo</div>
+        <div class="tip-body">Arroz cocido, huevos hervidos, pollo condimentado. 30 minutos el domingo = toda la semana sin "no tengo nada para comer" que es cuando caés en lo primero que encontrás.</div>
+      </div>
+    </div>
+
+  </div><!-- end app-body -->
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" onclick="showScreen('home',this)">
+      <div class="nav-icon">⚡</div>
+      <div class="nav-label">Inicio</div>
+    </div>
+    <div class="nav-item" onclick="showScreen('menu',this)">
+      <div class="nav-icon">🍽️</div>
+      <div class="nav-label">Menú</div>
+    </div>
+    <div class="nav-item" onclick="showScreen('shop',this)">
+      <div class="nav-icon">🛒</div>
+      <div class="nav-label">Compras</div>
+    </div>
+    <div class="nav-item" onclick="showScreen('ex',this)">
+      <div class="nav-icon">💪</div>
+      <div class="nav-label">Ejercicio</div>
+    </div>
+    <div class="nav-item" onclick="showScreen('tips',this)">
+      <div class="nav-icon">🧠</div>
+      <div class="nav-label">Tips</div>
+    </div>
+  </nav>
+</div>
+
+<script>
+function showScreen(name, el) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  el.classList.add('active');
+  document.querySelector('.app-body').scrollTop = 0;
+}
+
+function showDay(day, el) {
+  document.querySelectorAll('.day-meals').forEach(d => d.classList.remove('active'));
+  document.querySelectorAll('.day-chip').forEach(c => c.classList.remove('active'));
+  document.getElementById('meals-' + day).classList.add('active');
+  el.classList.add('active');
+}
+
+const shopData = [
+  { cat: '🥩 Proteínas', items: [
+    {n:'Pechuga de pollo',q:'1 kg'},
+    {n:'Carne picada magra',q:'500g'},
+    {n:'Atún al natural',q:'4 latas'},
+    {n:'Huevos',q:'18 unid'},
+    {n:'Jamón cocido',q:'200g'},
+    {n:'Salmón (opcional)',q:'300g'},
+  ]},
+  { cat: '🥦 Verduras', items: [
+    {n:'Lechuga',q:'1 planta'},
+    {n:'Tomates',q:'6 unid'},
+    {n:'Espinaca fresca',q:'200g'},
+    {n:'Brócoli',q:'1 cabeza'},
+    {n:'Zanahoria',q:'3 unid'},
+    {n:'Pepino',q:'2 unid'},
+    {n:'Palta / aguacate',q:'2 unid'},
+    {n:'Tomate cherry',q:'250g'},
+    {n:'Zucchini',q:'2 unid'},
+  ]},
+  { cat: '🍚 Carbos y cereales', items: [
+    {n:'Arroz integral',q:'500g'},
+    {n:'Pan integral',q:'1 paquete'},
+    {n:'Pasta integral',q:'500g'},
+    {n:'Avena',q:'500g'},
+    {n:'Papa',q:'4 unid'},
+    {n:'Lentejas',q:'400g'},
+  ]},
+  { cat: '🥛 Lácteos', items: [
+    {n:'Yogur griego entero',q:'400g'},
+    {n:'Leche entera',q:'1 litro'},
+    {n:'Queso en barra',q:'200g'},
+    {n:'Queso crema',q:'150g'},
+    {n:'Manteca',q:'100g'},
+  ]},
+  { cat: '🍎 Frutas', items: [
+    {n:'Bananas',q:'6 unid'},
+    {n:'Manzanas',q:'4 unid'},
+    {n:'Naranjas',q:'4 unid'},
+  ]},
+  { cat: '🫙 Snacks y despensa', items: [
+    {n:'Nueces',q:'200g'},
+    {n:'Almendras',q:'150g'},
+    {n:'Chocolate amargo 70%+',q:'1 barra'},
+    {n:'Aceitunas',q:'1 frasco'},
+    {n:'Aceite de oliva',q:''},
+    {n:'Salsa de tomate natural',q:''},
+    {n:'Caldo en cubos',q:''},
+    {n:'Limones',q:'3 unid'},
+    {n:'Mostaza',q:''},
+  ]},
+];
+
+let checked = {};
+try { checked = JSON.parse(localStorage.getItem('shopReset2') || '{}'); } catch(e) {}
+
+function buildShop() {
+  const c = document.getElementById('shop-categories');
+  c.innerHTML = '';
+  shopData.forEach((cat, ci) => {
+    const block = document.createElement('div');
+    block.className = 'shop-cat-block';
+    block.innerHTML = `<div class="shop-cat-head">${cat.cat}</div>`;
+    cat.items.forEach((item, ii) => {
+      const key = `${ci}-${ii}`;
+      const div = document.createElement('div');
+      div.className = 'shop-item' + (checked[key] ? ' checked' : '');
+      div.innerHTML = `<span class="item-name">${item.n}</span><span class="item-qty">${item.q}</span><div class="item-check">${checked[key]?'✓':''}</div>`;
+      div.onclick = () => { checked[key] = !checked[key]; try{localStorage.setItem('shopReset2',JSON.stringify(checked));}catch(e){} buildShop(); };
+      block.appendChild(div);
+    });
+    c.appendChild(block);
+  });
+}
+
+function resetShop() {
+  checked = {};
+  try { localStorage.setItem('shopReset2', '{}'); } catch(e) {}
+  buildShop();
+}
+
+buildShop();
+</script>
+</body>
+</html>
