@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Plan Reset">
+<meta name="theme-color" content="#0a0a0a">
+<title>Plan Reset</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --s1: #141414;
+  --s2: #1c1c1c;
+  --s3: #242424;
+  --lime: #c8f535;
+  --lime-d: rgba(200,245,53,0.10);
+  --lime-b: rgba(200,245,53,0.22);
+  --orange: #ff7b3a;
+  --orange-d: rgba(255,123,58,0.10);
+  --orange-b: rgba(255,123,58,0.28);
+  --red: #ff4545;
+  --red-d: rgba(255,69,69,0.18);
+  --red-b: rgba(255,69,69,0.40);
+  --blue: #60a5fa;
+  --blue-d: rgba(96,165,250,0.10);
+  --text: #f0f0f0;
+  --t2: #b8b8b8;
+  --t3: #888;
+  --border: #282828;
+  --nav: 66px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;font-size:15px;}
+#app{display:flex;flex-direction:column;height:100dvh;max-width:430px;margin:0 auto;background:var(--bg);position:relative;}
+
+/* HEADER */
+.hdr{flex-shrink:0;background:var(--bg);border-bottom:1px solid var(--border);
+  padding:13px 18px;padding-top:calc(13px + var(--safe-t));
+  display:flex;align-items:center;justify-content:space-between;}
+.hdr-title{font-size:19px;font-weight:800;letter-spacing:-0.5px;color:var(--lime);}
+.hdr-sub{font-size:10px;color:var(--t3);letter-spacing:1.5px;margin-top:1px;}
+.hdr-badge{background:var(--lime-d);border:1px solid var(--lime-b);color:var(--lime);
+  font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;letter-spacing:0.3px;}
+
+/* BODY */
+.body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+.screen{display:none;padding-bottom:calc(var(--nav) + 20px);}
+.screen.active{display:block;}
+
+/* NAV */
+.nav{position:absolute;bottom:0;left:0;right:0;
+  height:calc(var(--nav) + var(--safe-b));
+  background:var(--s1);border-top:1px solid var(--border);
+  display:flex;align-items:flex-start;padding-top:8px;z-index:100;}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:3px 0;}
+.ni-ic{font-size:19px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:7px;transition:background .2s;}
+.ni-lb{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:0.3px;transition:color .2s;}
+.ni.on .ni-ic{background:var(--lime-d);}
+.ni.on .ni-lb{color:var(--lime);}
+
+/* SHARED */
+.hero{padding:22px 18px 18px;border-bottom:1px solid var(--border);}
+.eyebrow{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--lime);font-weight:700;margin-bottom:5px;}
+.pg-title{font-size:30px;font-weight:800;letter-spacing:-1px;line-height:1.1;}
+.pg-title em{font-family:'Lora',serif;font-style:italic;font-weight:400;color:var(--lime);}
+.pg-desc{font-size:13px;color:var(--t2);margin-top:8px;line-height:1.65;font-family:'Lora',serif;}
+.sec-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--t3);font-weight:700;padding:18px 18px 8px;}
+.card{margin:0 18px 10px;background:var(--s1);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.card-hd{padding:11px 15px;background:var(--s2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-ti{font-size:14px;font-weight:700;}
+.card-su{font-size:11px;color:var(--t2);margin-top:1px;font-weight:400;}
+.card-bd{padding:14px 15px;}
+.pill{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+.p-lime{background:var(--lime-d);color:var(--lime);border:1px solid var(--lime-b);}
+.p-orange{background:var(--orange-d);color:var(--orange);}
+.p-red{background:var(--red-d);color:var(--red);}
+.p-gray{background:var(--s3);color:var(--t2);}
+.p-blue{background:var(--blue-d);color:var(--blue);}
+.alert{margin:0 18px 10px;border-radius:12px;padding:13px 15px;font-size:13px;font-family:'Lora',serif;line-height:1.65;}
+.al-lime{background:var(--lime-d);border:1px solid var(--lime-b);color:#d4f060;}
+.al-orange{background:var(--orange-d);border:1px solid var(--orange-b);color:#ffb380;}
+.al-red{background:var(--red-d);border:1px solid rgba(255,69,69,.2);color:#ff8888;}
+.alert strong{font-family:'Syne',sans-serif;font-weight:700;}
+
+/* ═══════════════════
+   SCREEN: HOME / TRACKER
+═══════════════════ */
+/* Active rule hero */
+.rule-hero{background:linear-gradient(135deg,#0f1f0a,#152808);border-bottom:1px solid var(--border);padding:22px 18px 20px;position:relative;overflow:hidden;}
+.rule-hero::after{content:'';position:absolute;right:-20px;top:-20px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(200,245,53,.07),transparent 70%);}
+.rule-lvl{display:inline-flex;align-items:center;gap:8px;background:var(--lime-d);border:1px solid var(--lime-b);padding:4px 12px;border-radius:20px;margin-bottom:12px;}
+.rule-lvl-num{font-size:11px;font-weight:800;color:var(--lime);letter-spacing:1px;}
+.rule-lvl-lbl{font-size:11px;color:var(--t2);letter-spacing:0.5px;}
+.rule-title{font-size:22px;font-weight:800;letter-spacing:-0.5px;line-height:1.2;margin-bottom:8px;}
+.rule-title span{color:var(--lime);}
+.rule-desc{font-size:13px;color:var(--t2);font-family:'Lora',serif;line-height:1.65;}
+
+/* Progress bar */
+.prog-wrap{margin:0 18px 10px;}
+.prog-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.prog-label-txt{font-size:12px;font-weight:700;color:var(--t2);}
+.prog-label-num{font-size:22px;font-weight:800;color:var(--lime);letter-spacing:-0.5px;line-height:1;}
+.prog-track{height:8px;background:var(--s2);border-radius:20px;overflow:hidden;border:1px solid var(--border);}
+.prog-bar{height:100%;background:var(--lime);border-radius:20px;transition:width .5s ease;}
+.prog-sub{font-size:11px;color:var(--t3);margin-top:5px;font-family:'Lora',serif;}
+
+/* Week cells */
+.weeks-grid{margin:0 18px 10px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.wk-cell{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .15s;user-select:none;}
+.wk-cell:active{transform:scale(.96);}
+.wk-cell.done{background:var(--lime-d);border-color:var(--lime-b);}
+.wk-cell.fail{background:var(--red-d);border-color:var(--red-b);}
+.wk-num{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:1px;margin-bottom:4px;}
+.wk-icon{font-size:20px;line-height:1;}
+.wk-cell.done .wk-num{color:var(--lime);}
+.wk-cell.fail .wk-num{color:var(--red);}
+
+/* Next rule preview */
+.next-rule{margin:0 18px 10px;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px 15px;opacity:.6;}
+.nr-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);font-weight:700;margin-bottom:6px;}
+.nr-title{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:3px;}
+.nr-desc{font-size:12px;color:var(--t3);font-family:'Lora',serif;line-height:1.5;}
+
+/* ═══════════════════
+   SCREEN: COMIDAS
+═══════════════════ */
+.tab-row{display:flex;gap:7px;padding:13px 18px 0;overflow-x:auto;scrollbar-width:none;}
+.tab-row::-webkit-scrollbar{display:none;}
+.tab-btn{flex-shrink:0;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;
+  border:1px solid var(--border);background:var(--s1);color:var(--t2);letter-spacing:0.3px;transition:all .15s;}
+.tab-btn.on{background:var(--lime);border-color:var(--lime);color:#0a0a0a;}
+
+.meal-section{padding:13px 18px;display:none;flex-direction:column;gap:10px;}
+.meal-section.on{display:flex;}
+
+.mb{background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.mb-hd{padding:9px 14px;background:var(--s2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.mb-type{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t2);}
+.mb-bd{padding:12px 14px;}
+.mb-name{font-size:15px;font-weight:700;margin-bottom:4px;letter-spacing:-0.2px;}
+.mb-desc{font-size:13px;color:var(--t2);line-height:1.55;font-family:'Lora',serif;}
+.mb-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.mb-note{font-size:11px;color:var(--lime);margin-top:6px;font-family:'Lora',serif;line-height:1.5;}
+
+.section-note{font-size:12px;color:var(--t3);font-family:'Lora',serif;font-style:italic;line-height:1.6;padding:4px 0 2px;}
+
+/* ═══════════════════
+   SCREEN: COMPRAS
+═══════════════════ */
+.shop-cat{margin:0 18px 10px;background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.shop-hd{padding:10px 14px;background:var(--s2);font-size:13px;font-weight:700;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;}
+.si{padding:10px 14px;font-size:14px;border-bottom:1px solid var(--s2);display:flex;justify-content:space-between;align-items:flex-start;cursor:pointer;transition:background .15s;user-select:none;gap:8px;}
+.si:last-child{border-bottom:none;}
+.si:active{background:var(--s2);}
+.si.ck{opacity:.35;}
+.si.ck .si-n{text-decoration:line-through;}
+.si-main{flex:1;min-width:0;}
+.si-top{display:flex;align-items:center;gap:6px;}
+.si-n{flex:1;}
+.si-sh{font-size:13px;flex-shrink:0;}
+.si-nt{font-size:11px;color:var(--t3);font-family:'Lora',serif;font-style:italic;line-height:1.4;margin-top:3px;}
+.si-q{font-size:12px;color:var(--t3);margin-right:2px;white-space:nowrap;flex-shrink:0;margin-top:2px;}
+.si-chk{width:21px;height:21px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent;transition:all .2s;flex-shrink:0;margin-top:1px;}
+.si.ck .si-chk{background:var(--lime);border-color:var(--lime);color:#0a0a0a;}
+.reset-btn{margin:0 18px 16px;width:calc(100% - 36px);padding:12px;background:var(--s1);border:1px solid var(--border);border-radius:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--t2);cursor:pointer;}
+
+/* ═══════════════════
+   SCREEN: EJERCICIO
+═══════════════════ */
+.ex-card{margin:0 18px 10px;background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.ex-hd{padding:11px 14px;background:var(--s2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.ex-ti{font-size:14px;font-weight:700;}
+.ex-su{font-size:11px;color:var(--t2);margin-top:1px;}
+.ex-list{padding:4px 0;}
+.ex-row{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-size:13px;border-bottom:1px solid var(--s2);}
+.ex-row:last-child{border-bottom:none;}
+.ex-sets{font-size:11px;font-weight:700;color:var(--lime);background:var(--lime-d);padding:3px 10px;border-radius:20px;}
+
+/* ═══════════════════
+   SCREEN: TIPS
+═══════════════════ */
+.tip-card{margin:0 18px 10px;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:15px;}
+.tip-icon{font-size:26px;margin-bottom:9px;}
+.tip-title{font-size:14px;font-weight:700;color:var(--lime);margin-bottom:5px;}
+.tip-body{font-size:13px;color:var(--t2);line-height:1.65;font-family:'Lora',serif;}
+.snack-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 18px 10px;}
+.snack-it{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:11px;font-size:13px;display:flex;gap:8px;align-items:center;font-family:'Lora',serif;}
+/* Priorizá / Evitá cards */
+.prio-card{border-left:3px solid var(--lime-b);}
+.evit-card{border-left:3px solid var(--red-b);}
+.prio-head{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.prio-ic{font-size:24px;line-height:1;}
+.prio-ttl{font-size:16px;font-weight:800;letter-spacing:-0.3px;color:var(--text);}
+.prio-why{font-size:13px;color:var(--t2);font-family:'Lora',serif;line-height:1.55;margin-bottom:12px;}
+.prio-why strong{color:var(--lime);font-weight:600;}
+.evit-card .prio-why strong{color:var(--orange);}
+.okrow{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.ok-col{padding:0 12px;}
+.ok-col:first-child{padding-left:0;border-right:1px solid var(--border);}
+.ok-col:last-child{padding-right:0;}
+.ok-lbl{font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px;}
+.ok-yes{color:var(--lime);}
+.ok-no{color:var(--orange);}
+.evit-card .ok-no{color:var(--red);}
+.ok-items{font-size:12.5px;color:var(--t2);font-family:'Lora',serif;line-height:1.7;}
+/* ── botón secundario (reset) ── */
+.w-btn-sec{background:var(--s1);border:1px solid var(--border);color:var(--t2);border-radius:10px;padding:11px;font-family:'Syne',sans-serif;font-size:12px;font-weight:600;cursor:pointer;width:100%;}
+/* ── BATCH COOKING ── */
+.bc-toggle{display:flex;gap:8px;padding:14px 18px 0;}
+.bc-tg{flex:1;padding:11px;text-align:center;border-radius:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;background:var(--s1);border:1.5px solid var(--border);color:var(--t3);transition:all .2s;}
+.bc-tg.on{background:var(--lime-d);border-color:var(--lime-b);color:var(--lime);}
+.bc-view{display:none;}
+.bc-view.on{display:block;}
+.bc-day{margin:14px 18px 0;background:linear-gradient(135deg,#141414,#1a1a12);border:1px solid var(--lime-b);border-radius:14px;overflow:hidden;}
+.bc-day-hd{padding:15px 16px 12px;}
+.bc-day-ttl{font-size:16px;font-weight:800;color:var(--lime);letter-spacing:-0.3px;}
+.bc-day-sub{font-size:12px;color:var(--t2);font-family:'Lora',serif;margin-top:4px;line-height:1.5;}
+.bc-step{display:flex;align-items:flex-start;gap:11px;padding:10px 16px;border-top:1px solid var(--border);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.bc-step:active{background:var(--s2);}
+.bc-chk{flex-shrink:0;width:21px;height:21px;border-radius:6px;border:1.5px solid var(--border);background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--bg);font-weight:800;margin-top:1px;}
+.bc-step.dn .bc-chk{background:var(--lime);border-color:var(--lime);}
+.bc-step.dn .bc-stx{color:var(--t3);text-decoration:line-through;}
+.bc-stx{flex:1;font-size:13px;color:var(--text);font-family:'Lora',serif;line-height:1.45;}
+.bc-stm{font-size:11px;color:var(--t3);white-space:nowrap;margin-top:2px;font-family:'Lora',serif;}
+.bc-who{display:inline-block;font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;margin-left:6px;vertical-align:middle;letter-spacing:.4px;}
+.bc-w-both{background:rgba(96,165,250,.14);color:var(--blue);}
+.bc-w-fede{background:var(--lime-d);color:var(--lime);}
+.bc-w-nena{background:rgba(255,123,58,.14);color:var(--orange);}
+.bc-mini{margin:0 18px;background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.bc-mini-hd{padding:13px 15px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+.bc-mini-bd{display:none;padding:0 15px 14px;font-size:13px;color:var(--t2);font-family:'Lora',serif;line-height:1.6;}
+.bc-mini.op .bc-mini-bd{display:block;}
+.bc-tbl{margin:0 18px;background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.bc-tr{display:flex;padding:10px 13px;border-bottom:1px solid var(--border);gap:10px;align-items:flex-start;}
+.bc-tr:last-child{border-bottom:none;}
+.bc-tr.hd{background:var(--s2);font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);font-weight:700;}
+.bc-c1{flex:1.4;font-size:12.5px;color:var(--text);font-family:'Lora',serif;line-height:1.4;}
+.bc-c2{flex:1;font-size:12px;color:var(--t2);font-family:'Lora',serif;line-height:1.4;}
+.bc-c3{flex:.75;font-size:11px;color:var(--t3);font-family:'Lora',serif;text-align:right;line-height:1.4;}
+.bc-rec{margin:0 18px 8px;background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.bc-rec.big{border-color:var(--lime-b);background:linear-gradient(135deg,#141414,#161a10);}
+.bc-rhd{padding:13px 15px;cursor:pointer;display:flex;align-items:center;gap:9px;-webkit-tap-highlight-color:transparent;}
+.bc-rhd:active{background:var(--s2);}
+.bc-rn{flex:1;font-size:14px;font-weight:700;color:var(--text);letter-spacing:-0.2px;}
+.bc-rec.big .bc-rn{font-size:16px;color:var(--lime);}
+.bc-rt{font-size:10.5px;color:var(--t3);white-space:nowrap;font-family:'Lora',serif;}
+.bc-arw{font-size:11px;color:var(--t3);transition:transform .2s;}
+.bc-rec.op .bc-arw{transform:rotate(90deg);}
+.bc-rbd{display:none;padding:0 15px 14px;}
+.bc-rec.op .bc-rbd{display:block;}
+.bc-ring{font-size:12.5px;color:var(--t2);font-family:'Lora',serif;line-height:1.6;padding-bottom:8px;}
+.bc-ring b{color:var(--text);font-weight:600;}
+.bc-rprep{font-size:12.5px;color:var(--t2);font-family:'Lora',serif;line-height:1.6;padding-top:9px;border-top:1px solid var(--border);}
+.bc-note{margin:10px 18px 0;padding:11px 14px;background:var(--s1);border-left:3px solid var(--orange);border-radius:0 10px 10px 0;font-size:12.5px;color:var(--t2);font-family:'Lora',serif;line-height:1.55;}
+.bc-note b{color:var(--orange);}
+.bc-pal{margin:0 18px 8px;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;gap:12px;align-items:flex-start;}
+.bc-pal-ic{font-size:24px;line-height:1;}
+.bc-pal-t{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.bc-pal-d{font-size:12.5px;color:var(--t2);font-family:'Lora',serif;line-height:1.55;}
+/* ── EQUIVALENCIAS (viven dentro de meal-section, sin margen lateral propio) ── */
+.eq-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.eq-row{display:flex;padding:9px 13px;border-bottom:1px solid var(--border);gap:8px;align-items:flex-start;}
+.eq-row:last-child{border-bottom:none;}
+.eq-row.hd{background:var(--s2);font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);font-weight:700;}
+.eq-g{flex:1.3;font-size:12.5px;color:var(--text);font-family:'Lora',serif;line-height:1.4;}
+.eq-q{flex:1;font-size:12px;color:var(--lime);font-family:'Syne',sans-serif;font-weight:700;line-height:1.4;}
+.eq-e{flex:1;font-size:11px;color:var(--t3);font-family:'Lora',serif;text-align:right;line-height:1.4;}
+.eq-note{background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--orange);border-radius:0 10px 10px 0;padding:11px 14px;font-size:12.5px;color:var(--t2);font-family:'Lora',serif;line-height:1.55;}
+.eq-note b{color:var(--orange);}
+.eq-note.lime{border-left-color:var(--lime);}
+.eq-note.lime b{color:var(--lime);}
+.eq-note.blue{border-left-color:var(--blue);}
+.eq-note.blue b{color:var(--blue);}
+.eq-mini{background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.eq-mini-hd{padding:13px 15px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;display:flex;justify-content:space-between;align-items:center;-webkit-tap-highlight-color:transparent;}
+.eq-mini-bd{display:none;padding:0 15px 14px;}
+.eq-mini.op .eq-mini-bd{display:block;}
+.eq-mini .bc-arw{font-size:11px;color:var(--t3);transition:transform .2s;}
+.eq-mini.op .bc-arw{transform:rotate(90deg);}
+.eq-day{padding:10px 0;border-bottom:1px solid var(--border);}
+.eq-day:last-child{border-bottom:none;}
+.eq-day-name{font-size:12px;font-weight:700;color:var(--lime);margin-bottom:4px;font-family:'Syne',sans-serif;letter-spacing:.3px;}
+.eq-day-meals{font-size:12px;color:var(--t2);font-family:'Lora',serif;line-height:1.7;}
+.eq-day-meals b{color:var(--text);font-weight:600;}
+.eq-obj{display:flex;gap:10px;align-items:flex-start;padding:8px 0;}
+.eq-obj:not(:last-child){border-bottom:1px solid var(--border);}
+.eq-obj-ic{font-size:19px;line-height:1;}
+.eq-obj-tx{font-size:13px;color:var(--t2);font-family:'Lora',serif;line-height:1.5;padding-top:1px;}
+</style>
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAFfElEQVR4nO3cPY4UVxSG4dMthxPPIibuZSBvwMkEjMgsR5ZZAcgBQqRDQOINWCyjRTiLmJh8HIwLerqru+7fuXXvd98n47+CVx+HamBjFVzf7Z5q/DrK/vn0+eK3//b760pPku7xfr/x/jV+8fhJCbicpZB7ctyFR+BFf0JCLis05h7W+ZKSYWcvNBEj12FDuXFvSz0IyhplnY/lNpW00ITsS+luTjH1lbLW0QtNzL5Gj/lQSmtRQROzr9iY1c6NObHNBQdNzL5Y5vNi2gsKmph9EfOy0AYXgyZmX6kxj3BuHAtp8WLQxIzWLDV5Nmhi9sc6p7nU5mzQxOyPuznPuUazPilEfaOv85KToFlnf6xzGXOtbpe+A9rBOp86bpaTozLW2RdBd4J1DvMjaM4Nf6yzj8N2WegOsM7htmascw2ss6+pYRYaUgi6cZwbcQgaUrbcz+1ineNc3+2eWGhIIehGsc5pCBpSCLpBrHM6goYUgm4M65yHoCGFoBvS4jpf3d6s/QhRXP7Dc/TnUrhXtzf2/ctDxadJR9CNWGude1vgJQQ9ILWIDxH0IHIi7uXcMCPoJnidG8pLfA5BCyoZck/rbEbQqyu1zh5r3FvMZgTdPa+zoseYzQh6VTnr7Hkf9xqzGZ8UdomYz+sq6N3bV2s/QjEp63x1e0PMC7o5OaaYD6Pev/u61uNUVeP1m0LMZh0FPUc97lrvkVViNuvo5FgKdvf2VTcnSci5Qcxpul7oOb2vds1P99RiNutooc2eA42JtKfVNiPmEroKehK7vC2FPXdueL+9OKYas1mnQZulnRMthT2p/ReIlGM26/yG3r/7mhTo9GPWvLEJ2Ue3Cz3JiXJa7NqrTcx+ug/arMzS1gj7zbcPxOxMImizcudDi3d2qtFiNhMK2qzsTdx71CPGbCYWtFn5qHsL+/uXh2FjNhMM2qz824tewh455Ilk0GbxnyqGaDlsYn4mG/TE411za1ET80/yQZtprzUxvzRE0BO1tSbmU0MFbeYXde2wiXnecEGb+f0djlpRE/N5QwZt5nNXm/mvNTFfNmzQk57WmpiXDR+0WR9RE3MYgv6fZ9S5YRNzOII+0OI/qiXmOAR9pKWoiTle1/8Ey8sU9VofmhByOhb6gjXWmpjzEPSCmlETcz6CDlAjamIug6ADeUZNzOUQdASPqIm5LIKO1NJrPZwi6ASlomadyyPoRLlRE7MPgs6QGjUx+yHoTNzUbSHoAmKiZp19EXQhIVETsz+CLojzY30EXRhRr4ugHRD1egjayXHUb759WOlJxkLQjljq+gjaGVHXRdAVEHU9BA0pBA0pBA0pBA0pBA0p/EczTv74+68XX/788O/J1338833NRxoCC13J65tf136EIRA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pBA0pGyu73ZPaz8EUAoLDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSkEDSnbx/v9Zu2HAEp4vN9vWGhIIWhIIWhI2Zo93x5rPwiQY2qYhYaUH0Gz0ujVYbssNKQQNKS8CJqzA705bvZkoYkavZhrlZMDUmaDZqXRunONnl1ookarLrV58eQgarRmqcnFG5qo0YqQFoP+UEjUWFtog8FvOYgaa4lpL+q1HVGjttjmot9DEzVqSWktK87ru91Tzo8H5uSMZtYnhaw1SsttqmiQLDZSlBxGl4UlbITw+B2+yslA4DCrc6L+B9oF7mp52V2qAAAAAElFTkSuQmCC">
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<script>
+(function(){
+  var d="{\"name\": \"Plan Reset\", \"short_name\": \"Plan Reset\", \"description\": \"Tu plan saludable personalizado\", \"start_url\": \".\", \"display\": \"standalone\", \"background_color\": \"#0d0d0d\", \"theme_color\": \"#0d0d0d\", \"orientation\": \"portrait\", \"icons\": [{\"src\": \"data:image/png;base64,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\", \"sizes\": \"192x192\", \"type\": \"image/png\"}, {\"src\": \"data:image/png;base64,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\", \"sizes\": \"512x512\", \"type\": \"image/png\", \"purpose\": \"any maskable\"}]}";
+  var b=new Blob([d],{type:'application/json'});
+  var l=document.createElement('link');
+  l.rel='manifest';l.href=URL.createObjectURL(b);
+  document.head.appendChild(l);
+})();
+</script>
+</head>
+<body>
+<div id="app">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div>
+    <div class="hdr-title">PLAN RESET</div>
+    <div class="hdr-sub">FEDERICO · 38 AÑOS · 85KG</div>
+  </div>
+  <div class="hdr-badge" id="hdr-badge">RECETAS</div>
+</div>
+
+<div class="body">
+
+<!-- ══ COMIDAS ══ -->
+<div class="screen active" id="sc-food">
+  <div class="hero">
+    <div class="eyebrow">Plan nutricional</div>
+    <div class="pg-title">Tu cuota,<br><em>tu manera</em></div>
+    <div class="pg-desc">Plan de Mimo Nutrición. Las cantidades son diarias — combinalas como quieras entre comidas, sin exceder los totales.</div>
+  </div>
+
+  <div class="tab-row">
+    <div class="tab-btn on" onclick="showFood('desal',this)">Desayuno</div>
+    <div class="tab-btn" onclick="showFood('media',this)">Guía</div>
+    <div class="tab-btn" onclick="showFood('almuerzo',this)">Almuerzo</div>
+    <div class="tab-btn" onclick="showFood('merienda',this)">Merienda</div>
+    <div class="tab-btn" onclick="showFood('cena',this)">Cena</div>
+  </div>
+
+  <!-- DESAYUNO -->
+  <div class="meal-section on" id="food-desal">
+    <div class="section-note">☕ Cuota diaria de desayuno + merienda — repartila como prefieras entre las dos comidas.</div>
+  <div class="eq-card">
+    <div class="eq-row hd"><div class="eq-g">Grupo</div><div class="eq-q">Cantidad/día</div><div class="eq-e">Equivale a</div></div>
+    <div class="eq-row"><div class="eq-g">Leche descremada</div><div class="eq-q">200 ml</div><div class="eq-e">1 taza</div></div>
+    <div class="eq-row"><div class="eq-g">Yogur descremado</div><div class="eq-q">200 ml</div><div class="eq-e">1 pote grande</div></div>
+    <div class="eq-row"><div class="eq-g">Queso untable descremado</div><div class="eq-q">4 cditas</div><div class="eq-e">al ras</div></div>
+    <div class="eq-row"><div class="eq-g">Queso cremoso magro</div><div class="eq-q">60 g</div><div class="eq-e">2 rebanadas</div></div>
+    <div class="eq-row"><div class="eq-g">Frutas</div><div class="eq-q">3 u.</div><div class="eq-e">o 1 taza trozada</div></div>
+    <div class="eq-row"><div class="eq-g">Palta</div><div class="eq-q">3x/sem<span class="bc-who bc-w-pend">⚠️ CONFIRMAR</span></div><div class="eq-e">~¼ palta/vez</div></div>
+    <div class="eq-row"><div class="eq-g">Huevos</div><div class="eq-q">2 + 2 claras</div><div class="eq-e">por día</div></div>
+    <div class="eq-row"><div class="eq-g">Frutos secos</div><div class="eq-q">10 g</div><div class="eq-e">10 almendras / 5 nueces</div></div>
+    <div class="eq-row"><div class="eq-g">Carbohidrato — elegir 1</div><div class="eq-q">ver nota</div><div class="eq-e">pan / galletas / avena</div></div>
+  </div>
+  <div class="eq-note">
+    <b>Elegí 1 por día:</b> pan integral 50g (2 rebanadas finas) · o 3 galletas de arroz · o avena<span class="bc-who bc-w-pend">⚠️ CONFIRMAR</span> — el PDF original decía "1/taza" (probablemente ¼ taza, sin confirmar).
+  </div>
+  <div class="eq-note lime">
+    <b>Guía rápida:</b> elegí una sola fuente de carbohidrato de desayuno/merienda por día — pan, galletas de arroz o avena.
+  </div>
+    <div class="sec-lbl">Recetario — principales y variaciones</div>
+    <div class="section-note">📋 marca las variaciones que vienen directo del menú semanal original de la nutricionista.</div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 1</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Café con leche + tostada</div>
+        <div class="mb-desc"><b>📋 Clásica:</b> pan integral (2 rebanadas) + 4 cditas de queso untable + ¼ palta<br><br><b>Con huevo:</b> pan integral + huevo pochado + ¼ palta</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 2</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Yogures</div>
+        <div class="mb-desc"><b>📋 Clásico:</b> yogur descremado (1 pote grande) + 1 fruta + frutos secos (5-10g)<br><br><b>Bowl con granola:</b> yogur + fruta trozada + granola de avena casera (usa la porción de avena del día)</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 3</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Panqueques de avena</div>
+        <div class="mb-desc"><b>📋 Dulces:</b> banana + fruta + café con leche<br><br><b>📋 Salados:</b> queso port salut + palta + cherrys</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 4</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Tostadas de arroz</div>
+        <div class="mb-desc"><b>📋 Con queso y huevo:</b> 3 tostadas de arroz + queso untable descremado + huevo + café con leche<br><br><b>Con palta y huevo pochado:</b> tostadas de arroz + ¼ palta + huevo pochado</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 5</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Huevos / omelette</div>
+        <div class="mb-desc"><b>Revueltos:</b> 2 huevos + 2 claras + 3 galletas de arroz + tomates cherry<br><br><b>Omelette:</b> 2 claras + 1 huevo + queso port salut (60g)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GUÍA (ex Media mañana) -->
+  <div class="meal-section" id="food-media">
+  <div class="section-note">📋 Plan de Mimo Nutrición — objetivo: descenso de peso saludable y progresivo. Todo lo de abajo es la referencia completa del plan, en un solo lugar.</div>
+
+  <div class="eq-card">
+    <div class="eq-obj"><span class="eq-obj-ic">📉</span><span class="eq-obj-tx">Lograr un descenso de peso saludable y progresivo</span></div>
+    <div class="eq-obj"><span class="eq-obj-ic">🏃</span><span class="eq-obj-tx">Aumentar actividad física</span></div>
+    <div class="eq-obj"><span class="eq-obj-ic">🩺</span><span class="eq-obj-tx">Mejorar valores de laboratorio</span></div>
+  </div>
+
+  <div class="eq-note lime">
+    <b>Regla general:</b> las cantidades son diarias, no por comida. Repartilas como quieras entre desayuno/merienda por un lado, y almuerzo/cena por otro — el objetivo es alcanzar y no exceder los totales del día.
+  </div>
+
+  <div class="eq-note">
+    <b>Podés partir el desayuno o la merienda en dos momentos</b> — por ejemplo, algo a media mañana en la oficina — usando parte de tu cuota diaria: una fruta, los 10g de frutos secos, un yogur o un huevo del batch son buena opción para eso, siempre descontando de la cuota del día.
+  </div>
+
+  <div class="sec-lbl">Otros — todos los días</div>
+  <div class="eq-card">
+    <div class="eq-row"><div class="eq-g">Aceites</div><div class="eq-q">2 cdas</div><div class="eq-e">por día</div></div>
+    <div class="eq-row"><div class="eq-g">Condimentos</div><div class="eq-q">libres</div><div class="eq-e">menos sal, más sabor</div></div>
+    <div class="eq-row"><div class="eq-g">Infusiones</div><div class="eq-q">libres</div><div class="eq-e">amargas o c/edulcorante</div></div>
+    <div class="eq-row"><div class="eq-g">Bebidas</div><div class="eq-q">agua, soda, jugo natural</div><div class="eq-e">evitar gaseosas/jugo envasado</div></div>
+  </div>
+  <div class="eq-note blue">
+    <b>Infusiones:</b> cafés no torrados, té verde, manzanilla, etc. Preferentemente amargos o con edulcorante medido.
+  </div>
+
+  <div class="sec-lbl">⚠️ Pendientes de confirmar</div>
+  <div class="eq-note">
+    <b>Cantidad exacta de avena:</b> el PDF original dice "1/taza" — probablemente ¼ taza, pero no está confirmado.<br><br>
+    <b>Cantidad de palta por uso:</b> se infirió ¼ palta del menú de ejemplo; la tabla de equivalencias no lo especifica en gramos.<br><br>
+    Tratá estos dos valores como orientativos hasta confirmarlos con la nutricionista.
+  </div>
+
+  <div class="sec-lbl">Marco de hábitos — Plan Reset</div>
+  <div class="eq-note lime">
+    Este plan reemplaza el contenido nutricional (qué y cuánto comer). Los hábitos de comportamiento de Plan Reset siguen vigentes en paralelo: desayuno con proteína, sin harinas refinadas de lunes a viernes, sin snacks a granel, y una comida libre a la semana. Son marco de conducta, no compiten con las cantidades de acá.
+  </div>
+
+  <div class="sec-lbl">Referencia</div>
+  <div class="eq-mini" id="eq-menu-mini">
+    <div class="eq-mini-hd" onclick="document.getElementById('eq-menu-mini').classList.toggle('op')">
+      <span>📅 Menú de ejemplo semanal</span><span class="bc-arw">›</span>
+    </div>
+    <div class="eq-mini-bd">
+      <div class="section-note" style="margin-top:0;">Es un ejemplo de cómo aplicar las equivalencias de arriba — no hay que seguirlo exacto. Sábado a la noche y domingo al mediodía/tarde quedan libres.</div>
+    <div class="eq-day">
+      <div class="eq-day-name">Lunes</div>
+      <div class="eq-day-meals"><b>Desayuno:</b> Café c/leche (½ taza) + 2 rebanadas finas de pan integral + 4 cditas de queso untable + ¼ palta<br><b>Almuerzo:</b> Wok de arroz integral (¼ plato) + pechuga de pollo (100g) + cebolla/morrón/brócoli gratinados<br><b>Merienda:</b> Yogur descremado grande + 1 fruta + frutos secos (5g)<br><b>Cena:</b> Pastel de pollo y calabaza con queso port salut</div>
+    </div>
+    <div class="eq-day">
+      <div class="eq-day-name">Martes</div>
+      <div class="eq-day-meals"><b>Desayuno:</b> Yogur descremado grande + 1 fruta + frutos secos (5g)<br><b>Almuerzo:</b> Tortilla de papa y espinaca, cebolla y queso port salut + ensalada<br><b>Merienda:</b> Tostado integral con queso port salut + huevo + cherrys + rúcula y palta + café con leche<br><b>Cena:</b> Churrasco (magro) + ensalada</div>
+    </div>
+    <div class="eq-day">
+      <div class="eq-day-name">Miércoles</div>
+      <div class="eq-day-meals"><b>Desayuno:</b> 3 tostadas de arroz c/queso untable descremado y huevo + café con leche<br><b>Almuerzo:</b> 2 rapiditas integrales de verdura y atún<br><b>Merienda:</b> Yogur descremado grande + 1 fruta + frutos secos (5g)<br><b>Cena:</b> 2 filet de merluza con queso port salut + ensalada</div>
+    </div>
+    <div class="eq-day">
+      <div class="eq-day-name">Jueves</div>
+      <div class="eq-day-meals"><b>Desayuno:</b> Yogur descremado grande + 1 fruta + frutos secos (5g)<br><b>Almuerzo:</b> 2 porciones tarta tapa simple de verduras + ensalada<br><b>Merienda:</b> 2 panqueques de avena y banana + fruta + café con leche<br><b>Cena:</b> Wok de solomillo y verduras + ensalada</div>
+    </div>
+    <div class="eq-day">
+      <div class="eq-day-name">Viernes</div>
+      <div class="eq-day-meals"><b>Desayuno:</b> Panqueque de avena salado + queso port salut + palta + cherrys<br><b>Almuerzo:</b> 2 milanesas de pollo + ensalada<br><b>Merienda:</b> Yogur descremado grande + 1 fruta + frutos secos (5g)<br><b>Cena:</b> Pollo al horno + papa/batata/morrón/cebolla</div>
+    </div>
+    <div class="eq-day">
+      <div class="eq-day-name">Sábado</div>
+      <div class="eq-day-meals"><b>Desayuno:</b> Yogur descremado grande + 1 fruta + frutos secos (5g)<br><b>Almuerzo:</b> Ensalada Caesar<br><b>Merienda:</b> Café c/leche (½ taza) + 2 rebanadas finas de pan integral + 4 cditas de queso untable + ¼ palta<br><b>Cena:</b> ¡Libre!</div>
+    </div>
+    <div class="eq-day">
+      <div class="eq-day-name">Domingo</div>
+      <div class="eq-day-meals"><b>Desayuno:</b> Yogur descremado grande + 1 fruta + frutos secos (5g)<br><b>Almuerzo:</b> ¡Libre!<br><b>Merienda:</b> ¡Libre!<br><b>Cena:</b> Carne al horno con vegetales + ensalada</div>
+    </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- ALMUERZO -->
+  <div class="meal-section" id="food-almuerzo">
+    <div class="section-note">🍴 Cuota diaria de almuerzo + cena — 200g de carne y 400g de vegetales por día, a repartir entre las dos.</div>
+  <div class="eq-card">
+    <div class="eq-row hd"><div class="eq-g">Grupo</div><div class="eq-q">Cantidad/día</div><div class="eq-e">Equivale a</div></div>
+    <div class="eq-row"><div class="eq-g">Carnes magras</div><div class="eq-q">200 g</div><div class="eq-e">1 churrasco, 2 milanesas, 1 pechuga</div></div>
+    <div class="eq-row"><div class="eq-g">Vegetales</div><div class="eq-q">400 g</div><div class="eq-e">4 chicos o 3 grandes</div></div>
+    <div class="eq-row"><div class="eq-g">Papa / choclo / batata</div><div class="eq-q">máx. 1</div><div class="eq-e">por día</div></div>
+    <div class="eq-row"><div class="eq-g">Legumbres</div><div class="eq-q">3 cdas</div><div class="eq-e">sumar a ensaladas</div></div>
+    <div class="eq-row"><div class="eq-g">Carbohidrato cocido</div><div class="eq-q">80 g · 3x/sem</div><div class="eq-e">¼ plato playo</div></div>
+    <div class="eq-row"><div class="eq-g">Aceites</div><div class="eq-q">2 cdas</div><div class="eq-e">por día</div></div>
+  </div>
+  <div class="eq-note blue">
+    <b>Carnes magras:</b> lomo, peceto, solomillo, pechuga de pollo, carré, merluza, atún al natural, bife, salmón.
+  </div>
+  <div class="eq-note">
+    <b>Reglas del carbohidrato cocido (arroz, fideos, quinoa, polenta):</b> solo 3 veces por semana, no todos los días. Usar integrales, acompañar siempre con vegetales, ideal como pre-entreno, preferirlo en el almuerzo. Nunca se elimina — es la mayor fuente de energía. Alternativas equivalentes: 2 empanadas, 2 porciones de pizza, o 2 porciones de tarta de tapa simple.
+  </div>
+  <div class="eq-note lime">
+    <b>Guía rápida para no exceder:</b> el carbohidrato cocido (arroz, fideos, quinoa, polenta, empanadas, pizza, tarta) va 3 veces por semana, no todos los días. La papa/batata/choclo tiene su propio cupo (máx. 1 por día) — no se suma al de carbohidrato cocido. 200g de carne + 400g de vegetales son el total del día entre almuerzo y cena, no por comida.
+  </div>
+    <div class="sec-lbl">Recetario — principales y variaciones</div>
+    <div class="section-note">📋 marca las variaciones que vienen directo del menú semanal original de la nutricionista.</div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 1</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Poke bowl</div>
+        <div class="mb-desc"><b>De atún:</b> 100g atún al natural + arroz integral (80g cocido) + pepino, zanahoria, rabanito y brotes<br><br><b>De salmón con quinoa:</b> salmón o atún + quinoa (80g cocida) + palta + vegetales crocantes</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 2</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Wok</div>
+        <div class="mb-desc"><b>📋 De pollo:</b> arroz integral (¼ plato) + pechuga de pollo (100g) + cebolla/morrón/brócoli gratinados<br><br><b>📋 De solomillo:</b> wok de solomillo y verduras + ensalada<br><br><b>Vegetariano:</b> wok de vegetales salteados con legumbres (3 cdas)</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 3</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Tarta</div>
+        <div class="mb-desc"><b>📋 De verduras:</b> 2 porciones tarta tapa simple de verduras (a elección) + ensalada<br><br><b>Individual:</b> tarta tapa simple, relleno a elección + ensalada grande</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 4</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Proteína + guarnición</div>
+        <div class="mb-desc"><b>📋 Milanesas de pollo al horno:</b> + ensalada<br><br><b>📋 Churrasco (magro):</b> + ensalada<br><br><b>📋 Filet de merluza:</b> con queso port salut + ensalada<br><br><b>📋 Pollo al horno:</b> + papa/batata/morrón/cebolla<br><br><b>📋 Carne al horno:</b> con vegetales + ensalada<br><br><b>📋 Pastel de pollo y calabaza:</b> gratinado con queso port salut<br><br><b>📋 Tortilla de papa y espinaca:</b> con queso port salut + ensalada<br><br><b>Solomillo grillado:</b> + wok de vegetales salteados<br><br><b>Churrasco magro + batata al horno:</b> usa el cupo de papa/batata del día</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 5</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Ensaladas completas</div>
+        <div class="mb-desc"><b>📋 Ensalada César liviana:</b> pollo grillado, aderezo a base de yogur, sin panceta<br><br><b>📋 Rapiditas integrales:</b> de verdura y atún<br><br><b>Legumbres salteadas:</b> 3 cdas de garbanzos o lentejas + vegetales + huevo duro — opción vegetariana</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 6</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Empanadas / pizza</div>
+        <div class="mb-desc"><b>Empanadas de carne al horno:</b> 2 unidades, alternativa al carbohidrato cocido + ensalada<br><br><b>Pizza casera:</b> 2 porciones, alternativa al carbohidrato cocido + ensalada</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MERIENDA -->
+  <div class="meal-section" id="food-merienda">
+    <div class="section-note">🧉 Es la misma cuota que el desayuno — si ya usaste parte a la mañana, elegí algo más liviano acá.</div>
+  <div class="eq-card">
+    <div class="eq-row hd"><div class="eq-g">Grupo</div><div class="eq-q">Cantidad/día</div><div class="eq-e">Equivale a</div></div>
+    <div class="eq-row"><div class="eq-g">Leche descremada</div><div class="eq-q">200 ml</div><div class="eq-e">1 taza</div></div>
+    <div class="eq-row"><div class="eq-g">Yogur descremado</div><div class="eq-q">200 ml</div><div class="eq-e">1 pote grande</div></div>
+    <div class="eq-row"><div class="eq-g">Queso untable descremado</div><div class="eq-q">4 cditas</div><div class="eq-e">al ras</div></div>
+    <div class="eq-row"><div class="eq-g">Queso cremoso magro</div><div class="eq-q">60 g</div><div class="eq-e">2 rebanadas</div></div>
+    <div class="eq-row"><div class="eq-g">Frutas</div><div class="eq-q">3 u.</div><div class="eq-e">o 1 taza trozada</div></div>
+    <div class="eq-row"><div class="eq-g">Palta</div><div class="eq-q">3x/sem<span class="bc-who bc-w-pend">⚠️ CONFIRMAR</span></div><div class="eq-e">~¼ palta/vez</div></div>
+    <div class="eq-row"><div class="eq-g">Huevos</div><div class="eq-q">2 + 2 claras</div><div class="eq-e">por día</div></div>
+    <div class="eq-row"><div class="eq-g">Frutos secos</div><div class="eq-q">10 g</div><div class="eq-e">10 almendras / 5 nueces</div></div>
+    <div class="eq-row"><div class="eq-g">Carbohidrato — elegir 1</div><div class="eq-q">ver nota</div><div class="eq-e">pan / galletas / avena</div></div>
+  </div>
+  <div class="eq-note">
+    <b>Elegí 1 por día:</b> pan integral 50g (2 rebanadas finas) · o 3 galletas de arroz · o avena<span class="bc-who bc-w-pend">⚠️ CONFIRMAR</span> — el PDF original decía "1/taza" (probablemente ¼ taza, sin confirmar).
+  </div>
+  <div class="eq-note lime">
+    <b>Guía rápida:</b> elegí una sola fuente de carbohidrato de desayuno/merienda por día — pan, galletas de arroz o avena.
+  </div>
+    <div class="sec-lbl">Recetario — principales y variaciones</div>
+    <div class="section-note">📋 marca las variaciones que vienen directo del menú semanal original de la nutricionista.</div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 1</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Café con leche + tostada</div>
+        <div class="mb-desc"><b>📋 Clásica:</b> pan integral (2 rebanadas) + 4 cditas de queso untable + ¼ palta<br><br><b>Con huevo:</b> pan integral + huevo pochado + ¼ palta</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 2</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Yogures</div>
+        <div class="mb-desc"><b>📋 Clásico:</b> yogur descremado (1 pote grande) + 1 fruta + frutos secos (5-10g)<br><br><b>Bowl con granola:</b> yogur + fruta trozada + granola de avena casera (usa la porción de avena del día)</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 3</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Panqueques de avena</div>
+        <div class="mb-desc"><b>📋 Dulces:</b> banana + fruta + café con leche<br><br><b>📋 Salados:</b> queso port salut + palta + cherrys</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 4</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Tostadas de arroz</div>
+        <div class="mb-desc"><b>📋 Con queso y huevo:</b> 3 tostadas de arroz + queso untable descremado + huevo + café con leche<br><br><b>Con palta y huevo pochado:</b> tostadas de arroz + ¼ palta + huevo pochado</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 5</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Huevos / omelette</div>
+        <div class="mb-desc"><b>Revueltos:</b> 2 huevos + 2 claras + 3 galletas de arroz + tomates cherry<br><br><b>Omelette:</b> 2 claras + 1 huevo + queso port salut (60g)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENA -->
+  <div class="meal-section" id="food-cena">
+    <div class="section-note">🌙 Misma cuota que el almuerzo. El carbohidrato cocido conviene concentrarlo al mediodía — a la noche, mejor liviana.</div>
+  <div class="eq-card">
+    <div class="eq-row hd"><div class="eq-g">Grupo</div><div class="eq-q">Cantidad/día</div><div class="eq-e">Equivale a</div></div>
+    <div class="eq-row"><div class="eq-g">Carnes magras</div><div class="eq-q">200 g</div><div class="eq-e">1 churrasco, 2 milanesas, 1 pechuga</div></div>
+    <div class="eq-row"><div class="eq-g">Vegetales</div><div class="eq-q">400 g</div><div class="eq-e">4 chicos o 3 grandes</div></div>
+    <div class="eq-row"><div class="eq-g">Papa / choclo / batata</div><div class="eq-q">máx. 1</div><div class="eq-e">por día</div></div>
+    <div class="eq-row"><div class="eq-g">Legumbres</div><div class="eq-q">3 cdas</div><div class="eq-e">sumar a ensaladas</div></div>
+    <div class="eq-row"><div class="eq-g">Carbohidrato cocido</div><div class="eq-q">80 g · 3x/sem</div><div class="eq-e">¼ plato playo</div></div>
+    <div class="eq-row"><div class="eq-g">Aceites</div><div class="eq-q">2 cdas</div><div class="eq-e">por día</div></div>
+  </div>
+  <div class="eq-note blue">
+    <b>Carnes magras:</b> lomo, peceto, solomillo, pechuga de pollo, carré, merluza, atún al natural, bife, salmón.
+  </div>
+  <div class="eq-note">
+    <b>Reglas del carbohidrato cocido (arroz, fideos, quinoa, polenta):</b> solo 3 veces por semana, no todos los días. Usar integrales, acompañar siempre con vegetales, ideal como pre-entreno, preferirlo en el almuerzo. Nunca se elimina — es la mayor fuente de energía. Alternativas equivalentes: 2 empanadas, 2 porciones de pizza, o 2 porciones de tarta de tapa simple.
+  </div>
+  <div class="eq-note lime">
+    <b>Guía rápida para no exceder:</b> el carbohidrato cocido (arroz, fideos, quinoa, polenta, empanadas, pizza, tarta) va 3 veces por semana, no todos los días. La papa/batata/choclo tiene su propio cupo (máx. 1 por día) — no se suma al de carbohidrato cocido. 200g de carne + 400g de vegetales son el total del día entre almuerzo y cena, no por comida.
+  </div>
+    <div class="sec-lbl">Recetario — principales y variaciones</div>
+    <div class="section-note">📋 marca las variaciones que vienen directo del menú semanal original de la nutricionista.</div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 1</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Poke bowl</div>
+        <div class="mb-desc"><b>De atún:</b> 100g atún al natural + arroz integral (80g cocido) + pepino, zanahoria, rabanito y brotes<br><br><b>De salmón con quinoa:</b> salmón o atún + quinoa (80g cocida) + palta + vegetales crocantes</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 2</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Wok</div>
+        <div class="mb-desc"><b>📋 De pollo:</b> arroz integral (¼ plato) + pechuga de pollo (100g) + cebolla/morrón/brócoli gratinados<br><br><b>📋 De solomillo:</b> wok de solomillo y verduras + ensalada<br><br><b>Vegetariano:</b> wok de vegetales salteados con legumbres (3 cdas)</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 3</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Tarta</div>
+        <div class="mb-desc"><b>📋 De verduras:</b> 2 porciones tarta tapa simple de verduras (a elección) + ensalada<br><br><b>Individual:</b> tarta tapa simple, relleno a elección + ensalada grande</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 4</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Proteína + guarnición</div>
+        <div class="mb-desc"><b>📋 Milanesas de pollo al horno:</b> + ensalada<br><br><b>📋 Churrasco (magro):</b> + ensalada<br><br><b>📋 Filet de merluza:</b> con queso port salut + ensalada<br><br><b>📋 Pollo al horno:</b> + papa/batata/morrón/cebolla<br><br><b>📋 Carne al horno:</b> con vegetales + ensalada<br><br><b>📋 Pastel de pollo y calabaza:</b> gratinado con queso port salut<br><br><b>📋 Tortilla de papa y espinaca:</b> con queso port salut + ensalada<br><br><b>Solomillo grillado:</b> + wok de vegetales salteados<br><br><b>Churrasco magro + batata al horno:</b> usa el cupo de papa/batata del día</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 5</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Ensaladas completas</div>
+        <div class="mb-desc"><b>📋 Ensalada César liviana:</b> pollo grillado, aderezo a base de yogur, sin panceta<br><br><b>📋 Rapiditas integrales:</b> de verdura y atún<br><br><b>Legumbres salteadas:</b> 3 cdas de garbanzos o lentejas + vegetales + huevo duro — opción vegetariana</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div class="mb-hd"><span class="mb-type">Principal 6</span></div>
+      <div class="mb-bd">
+        <div class="mb-name">Empanadas / pizza</div>
+        <div class="mb-desc"><b>Empanadas de carne al horno:</b> 2 unidades, alternativa al carbohidrato cocido + ensalada<br><br><b>Pizza casera:</b> 2 porciones, alternativa al carbohidrato cocido + ensalada</div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- end food screen -->
+
+<!-- ══ BATCH COOKING ══ -->
+<div class="screen" id="sc-batch">
+  <div class="hero">
+    <div class="eyebrow">Batch cooking</div>
+    <div class="pg-title">Cocinás <em>una vez</em></div>
+    <div class="pg-desc">Un domingo de 75–90 minutos resuelve la semana de los dos. Si falta un componente, el ensamble funciona igual: nada depende de que salga perfecto.</div>
+  </div>
+
+  <!-- Día de cocina: checklist compartido -->
+  <div class="bc-day">
+    <div class="bc-day-hd">
+      <div class="bc-day-ttl">🔥 Día de cocina — domingo</div>
+      <div class="bc-day-sub">El orden importa: lo que va al horno arranca primero y el resto se solapa. Tocá cada paso para tacharlo.</div>
+    </div>
+    <div id="bc-steps"></div>
+  </div>
+  <div style="padding:10px 18px 0;">
+    <button class="w-btn-sec" onclick="bcReset()">↺ Reiniciar para el próximo domingo</button>
+  </div>
+
+  <!-- Versión mínima -->
+  <div class="sec-lbl">Si el domingo no da</div>
+  <div class="bc-mini" id="bc-mini">
+    <div class="bc-mini-hd" onclick="document.getElementById('bc-mini').classList.toggle('op')">
+      <span>⏱ Versión mínima — 25 min</span><span class="bc-arw">›</span>
+    </div>
+    <div class="bc-mini-bd">
+      Hervir 8 huevos + hervir 2 pechugas + cortar fruta. Nada más.<br><br>
+      Con eso el desayuno de la semana está resuelto, que es lo único que realmente importa. El resto se improvisa sin drama.
+    </div>
+  </div>
+
+  <!-- Toggle vistas -->
+  <div class="bc-toggle">
+    <div class="bc-tg on" id="bc-tg-fede" onclick="bcView('fede')">👨 Fede</div>
+    <div class="bc-tg" id="bc-tg-nena" onclick="bcView('nena')">🧒 La nena</div>
+  </div>
+
+  <!-- ════ VISTA FEDE ════ -->
+  <div class="bc-view on" id="bc-v-fede">
+
+    <div class="bc-note" style="border-left-color:var(--lime);"><b style="color:var(--lime)">Plan de Mimo Nutrición:</b> las cantidades son diarias. El batch te arma los componentes de la semana — vos armás las porciones según la cuota del día.</div>
+
+    <div class="sec-lbl">🥩 Proteínas — freezer</div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🍗</div>
+      <div><div class="bc-pal-t">Pechugas de pollo hervidas o al horno</div><div class="bc-pal-d">Cortadas en trozos y porcionadas de a 200g — el cupo diario de carne.</div></div>
+    </div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🐟</div>
+      <div><div class="bc-pal-t">Filet de merluza al horno</div><div class="bc-pal-d">Porcionado según el cupo diario.</div></div>
+    </div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🍗</div>
+      <div><div class="bc-pal-t">Milanesas de pollo horneadas</div><div class="bc-pal-d">Crudas empanadas para freezer, o ya cocidas.</div></div>
+    </div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🍖</div>
+      <div><div class="bc-pal-t">Albóndigas o hamburguesas de pollo</div><div class="bc-pal-d">Alternativa a la carne picada de vaca, para quien no come carne picada en casa.</div></div>
+    </div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🥫</div>
+      <div><div class="bc-pal-t">Atún al natural en lata</div><div class="bc-pal-d">Sin cocción, ideal para armar rápido.</div></div>
+    </div>
+
+    <div class="sec-lbl">🥦 Vegetales — freezer o heladera</div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🧊</div>
+      <div><div class="bc-pal-t">Bandeja de vegetales asados o salteados</div><div class="bc-pal-d">Brócoli, zanahoria, zapallito, morrón, cebolla — porcionados en bolsas de 400g y congelados.</div></div>
+    </div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🥬</div>
+      <div><div class="bc-pal-t">Espinaca y acelga blanqueadas</div><div class="bc-pal-d">Congeladas en porciones, para tortillas o tartas.</div></div>
+    </div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🥗</div>
+      <div><div class="bc-pal-t">Vegetales crudos lavados y cortados</div><div class="bc-pal-d">Para ensaladas rápidas — van en heladera, no en freezer.</div></div>
+    </div>
+
+    <div class="sec-lbl">🫘 Legumbres</div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🫘</div>
+      <div><div class="bc-pal-t">Garbanzos o lentejas cocidos en bulk</div><div class="bc-pal-d">Porcionados de a 3 cdas soperas y congelados.</div></div>
+    </div>
+
+    <div class="sec-lbl">🍚 Carbohidratos cocidos — 3 veces por semana</div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🍚</div>
+      <div><div class="bc-pal-t">Arroz integral o quinoa cocidos en bulk<span class="bc-who bc-w-both">3X/SEM</span></div><div class="bc-pal-d">Porcionados de a 80g y congelados. Se suman aparte, solo 3 veces por semana.</div></div>
+    </div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🥧</div>
+      <div><div class="bc-pal-t">Tapas de tarta simple pre-armadas<span class="bc-who bc-w-both">3X/SEM</span></div><div class="bc-pal-d">Listas para rellenar y hornear.</div></div>
+    </div>
+
+    <div class="sec-lbl">🍱 Combos completos para freezer</div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🥧</div>
+      <div><div class="bc-pal-t">Tarta de verduras</div><div class="bc-pal-d">2 porciones, pre-armada cruda o cocida.</div></div>
+    </div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🍲</div>
+      <div><div class="bc-pal-t">Pastel de pollo y calabaza gratinado</div><div class="bc-pal-d">Con queso port salut, porcionado.</div></div>
+    </div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🥘</div>
+      <div><div class="bc-pal-t">Wok de vegetales con proteína</div><div class="bc-pal-d">Porcionado en viandas individuales.</div></div>
+    </div>
+
+    <div class="sec-lbl">🎒 Sin heladera — para la oficina</div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🎒</div>
+      <div><div class="bc-pal-t">Galletas de arroz + queso port salut + frutos secos + atún</div><div class="bc-pal-d">No perecedero, para llevar y dejar en el cajón.</div></div>
+    </div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🍏</div>
+      <div><div class="bc-pal-t">Fruta entera + frutos secos + tostadas de arroz</div><div class="bc-pal-d">Opción sin refrigeración.</div></div>
+    </div>
+
+    <div class="sec-lbl">Reglas de armado</div>
+    <div class="bc-note"><b>Etiquetá</b> cada porción con fecha y contenido — ej. "Pollo 200g · vegetales 400g".</div>
+    <div class="bc-note"><b>Armá viandas completas</b> cuando puedas (proteína + vegetales + carbohidrato del día) para no pesar cada vez.</div>
+    <div class="bc-note"><b>El carbohidrato cocido se congela aparte</b> y se suma solo 3 veces por semana — no se mezcla con las otras porciones.</div>
+  </div>
+
+  <!-- ════ VISTA NENA ════ -->
+  <div class="bc-view" id="bc-v-nena">
+
+    <div class="bc-note"><b>Restricciones:</b> sin carne picada · la vianda del jardín va sin heladera · freezer chico · texturas que acepte.</div>
+
+    <div class="sec-lbl">Desayuno, merienda y vianda</div>
+    <div class="bc-rec" id="r-n1">
+      <div class="bc-rhd" onclick="bcTog('r-n1')"><span class="bc-rn">Muffins de avena y banana ❄️</span><span class="bc-rt">20 min</span><span class="bc-arw">›</span></div>
+      <div class="bc-rbd">
+        <div class="bc-ring"><b>Ingredientes:</b> 2 bananas maduras + 2 huevos + 1 taza de avena + 1 cdta de polvo de hornear. Opcional: arándanos, manzana rallada o 1 cda de cacao.</div>
+        <div class="bc-rprep">Mezclar todo, volcar en moldes de muffin y hornear a 180° por 18–20 min. Enfriar y freezar individuales.</div>
+      </div>
+    </div>
+    <div class="bc-rec" id="r-n2">
+      <div class="bc-rhd" onclick="bcTog('r-n2')"><span class="bc-rn">Tortillitas o budín de zanahoria ❄️</span><span class="bc-rt">25 min</span><span class="bc-arw">›</span></div>
+      <div class="bc-rbd">
+        <div class="bc-ring"><b>Ingredientes:</b> 1 taza de zanahoria rallada (o calabaza cocida pisada) + 2 huevos + ½ taza de avena + queso rallado.</div>
+        <div class="bc-rprep">En sartén salen tortillitas; en budinera al horno 180° por 25 min sale budín. Las dos versiones se freezan bien.</div>
+      </div>
+    </div>
+    <div class="bc-rec" id="r-n3">
+      <div class="bc-rhd" onclick="bcTog('r-n3')"><span class="bc-rn">Pancitos de banana y avena ❄️</span><span class="bc-rt">35 min</span><span class="bc-arw">›</span></div>
+      <div class="bc-rbd">
+        <div class="bc-ring"><b>Ingredientes:</b> misma base que los muffins, sin azúcar.</div>
+        <div class="bc-rprep">En budinera, horno 180° por 30–35 min. Cortar en rodajas y freezar separadas con papel entre medio.</div>
+      </div>
+    </div>
+    <div class="bc-rec" id="r-n4">
+      <div class="bc-rhd" onclick="bcTog('r-n4')"><span class="bc-rn">Bolitas de avena — sin cocción ❄️</span><span class="bc-rt">10 min</span><span class="bc-arw">›</span></div>
+      <div class="bc-rbd">
+        <div class="bc-ring"><b>Ingredientes:</b> 1 banana pisada (o 4–5 dátiles procesados) + 1 taza de avena + 1 cda de manteca de maní. Cacao opcional.</div>
+        <div class="bc-rprep">Formar bolitas y freezar crudas. Se comen casi directo del freezer.</div>
+      </div>
+    </div>
+    <div class="bc-rec" id="r-n5">
+      <div class="bc-rhd" onclick="bcTog('r-n5')"><span class="bc-rn">Panqueques de avena ❄️<span class="bc-who bc-w-both">COMPARTIDO</span></span><span class="bc-rt">10 min</span><span class="bc-arw">›</span></div>
+      <div class="bc-rbd">
+        <div class="bc-ring"><b>Ingredientes:</b> 2 huevos + 3 cdas de avena + 1 banana pisada.</div>
+        <div class="bc-rprep">Los mismos que hace Fede para el desayuno. Para la vianda: enrollados con queso untable o mermelada sin azúcar.</div>
+      </div>
+    </div>
+
+    <div class="bc-note" style="border-left-color:var(--blue);">
+      <b style="color:var(--blue)">Cómo funciona la vianda sin heladera:</b> se saca del freezer la noche anterior. A la mañana ya está descongelado y aguanta hasta el mediodía. Sumar fruta firme — banana, mandarina, o manzana en gajos con unas gotas de limón.
+    </div>
+
+    <div class="sec-lbl">Almuerzo y cena</div>
+    <div class="bc-rec" id="r-n6">
+      <div class="bc-rhd" onclick="bcTog('r-n6')"><span class="bc-rn">Pollo desmenuzado en salsa ❄️<span class="bc-who bc-w-both">COMPARTIDO</span></span><span class="bc-rt">20 min</span><span class="bc-arw">›</span></div>
+      <div class="bc-rbd">
+        <div class="bc-ring"><b>Ingredientes:</b> pechuga hervida + 1 lata de tomate triturado + 1 zanahoria rallada + aceite + pizca de sal.</div>
+        <div class="bc-rprep">Desmenuzar la pechuga con dos tenedores. Cocinar la salsa 10–15 min hasta que la zanahoria ablande y mezclar. Acompaña fideos o arroz.</div>
+      </div>
+    </div>
+    <div class="bc-rec" id="r-n7">
+      <div class="bc-rhd" onclick="bcTog('r-n7')"><span class="bc-rn">Albóndigas de pollo ❄️</span><span class="bc-rt">25 min</span><span class="bc-arw">›</span></div>
+      <div class="bc-rbd">
+        <div class="bc-ring"><b>Ingredientes:</b> 1 pechuga cruda + 1 huevo + 3–4 cdas de avena o pan rallado + queso rallado + sal.</div>
+        <div class="bc-rprep">Procesar todo, formar bolitas y cocinar en la salsa de tomate, o al horno 180° por 20 min. Freezar con la salsa. Este es el reemplazo de la carne picada.</div>
+      </div>
+    </div>
+    <div class="bc-rec" id="r-n8">
+      <div class="bc-rhd" onclick="bcTog('r-n8')"><span class="bc-rn">Croquetas de calabaza y pollo ❄️<span class="bc-who bc-w-both">COMPARTIDO</span></span><span class="bc-rt">30 min</span><span class="bc-arw">›</span></div>
+      <div class="bc-rbd">
+        <div class="bc-ring"><b>Ingredientes:</b> 1 taza de calabaza cocida pisada + 1 taza de pollo desmenuzado + 1 huevo + 4–5 cdas de avena + sal.</div>
+        <div class="bc-rprep">Formar croquetas y hornear a 180° por 25–30 min, dando vuelta a la mitad.</div>
+      </div>
+    </div>
+    <div class="bc-rec" id="r-n9">
+      <div class="bc-rhd" onclick="bcTog('r-n9')"><span class="bc-rn">Tortilla de papa o calabaza ❄️<span class="bc-who bc-w-both">COMPARTIDO</span></span><span class="bc-rt">30 min</span><span class="bc-arw">›</span></div>
+      <div class="bc-rbd">
+        <div class="bc-ring"><b>Ingredientes:</b> 2–3 papas (o calabaza) cocidas + 3 huevos + sal.</div>
+        <div class="bc-rprep">Asadera aceitada, horno 180° por 25–30 min. Cortar en porciones y freezar.</div>
+      </div>
+    </div>
+    <div class="bc-rec" id="r-n10">
+      <div class="bc-rhd" onclick="bcTog('r-n10')"><span class="bc-rn">Croquetas de merluza ❄️</span><span class="bc-rt">25 min</span><span class="bc-arw">›</span></div>
+      <div class="bc-rbd">
+        <div class="bc-ring"><b>Ingredientes:</b> 1 filet cocido y desmenuzado + 1 taza de papa pisada + 1 huevo + sal.</div>
+        <div class="bc-rprep">Horno 180° por 25 min. Alternativa más simple: el filet al horno con un hilo de aceite, 15–20 min.</div>
+      </div>
+    </div>
+    <div class="bc-rec" id="r-n11">
+      <div class="bc-rhd" onclick="bcTog('r-n11')"><span class="bc-rn">Arroz o fideos con vegetales ❄️</span><span class="bc-rt">20 min</span><span class="bc-arw">›</span></div>
+      <div class="bc-rbd">
+        <div class="bc-ring"><b>Ingredientes:</b> zucchini, zanahoria y brócoli en cubos chicos + arroz o fideos.</div>
+        <div class="bc-rprep">Saltear o hervir los vegetales y mezclar con el arroz o los fideos. Porcionar y freezar.</div>
+      </div>
+    </div>
+    <div class="bc-rec" id="r-n12">
+      <div class="bc-rhd" onclick="bcTog('r-n12')"><span class="bc-rn">Pollo hervido con vegetales</span><span class="bc-rt">25 min</span><span class="bc-arw">›</span></div>
+      <div class="bc-rbd"><div class="bc-rprep">El sistema que ya usan: papa, batata, zanahoria, brócoli, zucchini, boniato. Se mantiene tal cual — funciona bien.</div></div>
+    </div>
+
+    <div class="bc-rec" id="r-n13">
+      <div class="bc-rhd" onclick="bcTog('r-n13')"><span class="bc-rn">Tortillitas de espinaca y huevo ❄️</span><span class="bc-rt">15 min</span><span class="bc-arw">›</span></div>
+      <div class="bc-rbd">
+        <div class="bc-ring"><b>Ingredientes:</b> arroz cocido + huevo + queso rallado + espinaca.</div>
+        <div class="bc-rprep">Mezclar todo y cocinar de a cucharadas en sartén o plancha, como tortitas chicas. Se freezan bien.</div>
+      </div>
+    </div>
+    <div class="bc-rec" id="r-n14">
+      <div class="bc-rhd" onclick="bcTog('r-n14')"><span class="bc-rn">Tortillitas de arroz — receta de mamá ❄️</span><span class="bc-rt">20 min</span><span class="bc-arw">›</span></div>
+      <div class="bc-rbd">
+        <div class="bc-ring"><b>Ingredientes:</b> arroz cocido (mejor si es en caldo de verduras o pollo, y si es carnaroli mejor) + 2 huevos (o 1 si hay poco arroz) + queso rallado + espinaca o brócoli cocido y cortado. Opcional: pollo o carne picadita.</div>
+        <div class="bc-rprep">Mezclar todo y cocinar de a cucharadas en sartén o plancha. Se freezan bien.</div>
+      </div>
+    </div>
+    <div class="bc-rec" id="r-n15">
+      <div class="bc-rhd" onclick="bcTog('r-n15')"><span class="bc-rn">Caldo de verduras ❄️<span class="bc-who bc-w-both">COMPARTIDO</span></span><span class="bc-arw">›</span></div>
+      <div class="bc-rbd">
+        <div class="bc-ring"><b>Ingredientes:</b> verduras a elección (zanahoria, zapallo, apio, cebolla, puerro).</div>
+        <div class="bc-rprep">Cocinar las verduras y procesar con minipimer directo en la olla. Freezar en porciones — sirve de base para sopas o para cocinar el arroz de las tortillitas.</div>
+      </div>
+    </div>
+    <div class="bc-rec" id="r-n16">
+      <div class="bc-rhd" onclick="bcTog('r-n16')"><span class="bc-rn">Tarta de espinaca ❄️<span class="bc-who bc-w-both">COMPARTIDO</span></span><span class="bc-arw">›</span></div>
+      <div class="bc-rbd">
+        <div class="bc-ring"><b>Ingredientes:</b> espinaca, huevo, queso rallado, tapa de tarta (o sin tapa, tipo budín).</div>
+        <div class="bc-rprep">Armar como tarta clásica y hornear a 180° hasta dorar. Cortar en porciones y freezar — se recalienta directo en horno o microondas.</div>
+      </div>
+    </div>
+
+    <div class="sec-lbl">Reglas de freezado — el huevo</div>
+    <div class="bc-tbl">
+      <div class="bc-tr hd"><div class="bc-c1">Estado</div><div class="bc-c3" style="flex:1.1;text-align:left;">¿Se puede?</div></div>
+      <div class="bc-tr"><div class="bc-c1">Crudo con cáscara</div><div class="bc-c3" style="flex:1.1;text-align:left;color:var(--red)">❌ Nunca — revienta</div></div>
+      <div class="bc-tr"><div class="bc-c1">Crudo sin cáscara</div><div class="bc-c3" style="flex:1.1;text-align:left;color:var(--orange)">⚠️ Queda gomoso. No vale la pena</div></div>
+      <div class="bc-tr"><div class="bc-c1">Duro</div><div class="bc-c3" style="flex:1.1;text-align:left;color:var(--red)">❌ Gomoso y acuoso. Hacerlo fresco</div></div>
+      <div class="bc-tr"><div class="bc-c1">Cocido dentro de una preparación</div><div class="bc-c3" style="flex:1.1;text-align:left;color:var(--lime)">✅ Perfecto</div></div>
+    </div>
+    <div class="bc-note" style="border-left-color:var(--lime);"><b style="color:var(--lime)">Todo el batch cooking de la nena</b> entra en la última categoría: muffins, panqueques, tortillas, croquetas y albóndigas se freezan sin problema.</div>
+
+    <div class="bc-note"><b>Regla general:</b> cocinar → enfriar rápido (no dejar horas a temperatura ambiente) → freezar en porciones → recalentar hasta que largue vapor → nunca recongelar lo descongelado.</div>
+
+    <div class="sec-lbl">Almacenamiento en freezer chico</div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🧊</div>
+      <div>
+        <div class="bc-pal-t">Bolsas planas tipo ziploc</div>
+        <div class="bc-pal-d">Para componentes y desayunos. Se congelan acostadas y después se apilan paradas como carpetas: máximo ahorro de espacio.</div>
+      </div>
+    </div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🍱</div>
+      <div>
+        <div class="bc-pal-t">Bandejitas con divisiones</div>
+        <div class="bc-pal-d">Para almuerzos y cenas completas, en porciones de 1. Sacás y va directo al microondas.</div>
+      </div>
+    </div>
+    <div class="bc-pal">
+      <div class="bc-pal-ic">🥣</div>
+      <div>
+        <div class="bc-pal-t">Potes de silicona</div>
+        <div class="bc-pal-d">Los que ya tienen sirven para componentes sueltos y porciones chicas, no para plato completo. El sistema ideal es híbrido: bandejitas para el plato completo, bolsas planas para todo lo demás.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ COMPRAS ══ -->
+<div class="screen" id="sc-shop">
+  <div class="hero">
+    <div class="eyebrow">Supermercado</div>
+    <div class="pg-title">Lista de<br><em>compras</em></div>
+    <div class="pg-desc">Ordenada por sector, con las marcas y variedades sugeridas por Mimo Nutrición. Tocá para tachar.</div>
+  </div>
+  <div class="bc-note" style="border-left-color:var(--blue);margin-top:14px;">
+    <b style="color:var(--blue)">Marcas:</b> son las que aparecen como referencia en el PDF original — sugerencias, no obligación. Cualquier equivalente del mismo tipo (descremado/integral/magro) sirve igual. Las que llevan <span class="bc-who bc-w-pend">⚠️ CONFIRMAR</span> no se leían con certeza en la foto. La categoría <b>🧒 Extra — recetas de Cata</b> son ingredientes para el batch cooking de la nena que no vienen en el plan de Fede.
+  </div>
+  <div id="shop-cats"></div>
+  <button class="reset-btn" onclick="resetShop()">↺ Nueva semana — reiniciar lista</button>
+
+  <div class="sec-lbl">❌ Evitar</div>
+  <div class="bc-note">
+    Gaseosas <span style="color:var(--t3)">(el PDF muestra Coca-Cola, Sprite, Fanta, 7up y Pepsi como ejemplo de lo que no tomar)</span> y jugos envasados. Agua, soda y jugos naturales de fruta sí están permitidos.
+  </div>
+
+  <div class="sec-lbl">Sobre los carbohidratos</div>
+  <div class="bc-note" style="border-left-color:var(--lime);">
+    El carbohidrato de desayuno/merienda (pan, galletas de arroz o avena) se elige <b style="color:var(--lime)">1 por día</b>. El carbohidrato cocido de almuerzo/cena (arroz, fideos, quinoa, polenta) va <b style="color:var(--lime)">3 veces por semana</b>, no todos los días — y conviene concentrarlo en el almuerzo. Nunca se elimina: es la mayor fuente de energía del plan.
+  </div>
+</div>
+
+<!-- ══ TIPS ══ -->
+<div class="screen" id="sc-tips">
+  <div class="hero">
+    <div class="eyebrow">Consejos</div>
+    <div class="pg-title">Para sostener<br><em>el plan</em></div>
+    <div class="pg-desc">Lo que dice Mimo Nutrición, en forma de hábitos concretos.</div>
+  </div>
+
+  <div class="sec-lbl">Snacks dentro del plan</div>
+  <div class="snack-grid">
+    <div class="snack-it"><span style="font-size:20px;">🍎</span>Fruta entera</div>
+    <div class="snack-it"><span style="font-size:20px;">🥜</span>Frutos secos (10g)</div>
+    <div class="snack-it"><span style="font-size:20px;">🥛</span>Yogur descremado</div>
+    <div class="snack-it"><span style="font-size:20px;">🥚</span>Huevo duro</div>
+    <div class="snack-it"><span style="font-size:20px;">🍘</span>Galleta de arroz + queso</div>
+    <div class="snack-it"><span style="font-size:20px;">🥑</span>Palta en tostada</div>
+  </div>
+
+  <div class="sec-lbl">Cómo sostenerlo</div>
+  <div class="tip-card">
+    <div class="tip-icon">📅</div>
+    <div class="tip-title">Las cantidades son diarias, no por comida</div>
+    <div class="tip-body">Repartilas como quieras entre desayuno/merienda por un lado, y almuerzo/cena por otro. La única regla es alcanzar y no exceder el total del día — no hay que cumplir cada casillero en cada comida.</div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-icon">🍚</div>
+    <div class="tip-title">El carbohidrato nunca se elimina</div>
+    <div class="tip-body">Es la mayor fuente de energía del plan. El de desayuno/merienda (pan, galletas de arroz o avena) se elige 1 por día. El cocido de almuerzo/cena (arroz, fideos, quinoa, polenta) va 3 veces por semana — no todos los días — y conviene concentrarlo en el almuerzo, como pre-entreno.</div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-icon">📦</div>
+    <div class="tip-title">El prep del domingo resuelve la semana</div>
+    <div class="tip-body">Proteína porcionada de a 200g y vegetales de a 400g en el freezer significan que cada comida ya está resuelta — no hay que pesar ni decidir de nuevo cada vez. Etiquetá cada porción con fecha y contenido.</div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-icon">🧂</div>
+    <div class="tip-title">Condimentos libres, gaseosas no</div>
+    <div class="tip-body">Los condimentos son libres — menos sal, más sabor, sin culpa. Lo que sí se evita son las gaseosas y los jugos envasados. Agua, soda y jugo natural de fruta están permitidos sin límite.</div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-icon">☕</div>
+    <div class="tip-title">Infusiones, mejor amargas</div>
+    <div class="tip-body">Café no torrado, té verde, manzanilla. Si necesitás endulzar, mejor edulcorante medido que azúcar de más.</div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-icon">🔁</div>
+    <div class="tip-title">Un exceso puntual no arruina el plan</div>
+    <div class="tip-body">Como las cantidades son diarias, al otro día seguís con la cuota de siempre — no hay que compensar de más ni saltear comidas para "descontar" lo de ayer.</div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-icon">🏢</div>
+    <div class="tip-title">La bandeja de facturas en la oficina</div>
+    <div class="tip-body">Llegar con el desayuno resuelto (algo del banco de opciones, armado la noche anterior) hace que la bandeja deje de ser un problema — no es fuerza de voluntad, es no llegar con hambre real.</div>
+  </div>
+</div>
+
+</div><!-- body -->
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="ni on" onclick="showScreen('food',this)"><div class="ni-ic">🍽️</div><div class="ni-lb">Comidas</div></div>
+  <div class="ni" onclick="showScreen('batch',this)"><div class="ni-ic">🔥</div><div class="ni-lb">Batch</div></div>
+  <div class="ni" onclick="showScreen('shop',this)"><div class="ni-ic">🛒</div><div class="ni-lb">Compras</div></div>
+  <div class="ni" onclick="showScreen('tips',this)"><div class="ni-ic">🧠</div><div class="ni-lb">Tips</div></div>
+</nav>
+
+</div><!-- app -->
+
+<script>
+// ── NAV ──
+function showScreen(n,el){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(i=>i.classList.remove('on'));
+  document.getElementById('sc-'+n).classList.add('active');
+  el.classList.add('on');
+  document.querySelector('.body').scrollTop=0;
+}
+
+// ── FOOD TABS ──
+function showFood(t,el){
+  document.querySelectorAll('.meal-section').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('food-'+t).classList.add('on');
+  el.classList.add('on');
+}
+
+// ── SHOPPING ──
+const shopData=[
+  {cat:'🥛 Lácteos',items:[
+    {n:'Leche descremada',q:'',nt:'La Serenísima (Leche Fresca Liviana / Protein 46g / Menos Calorías 0% / Reducida en Lactosa) o Las Tres Niñas Vida Activa Proteína'},
+    {n:'Yogur descremado',q:'',nt:'Tregar Natural sin azúcar, Dahi Firme Descremado Natural, Ser Natural, Yogurísimo, Ser PRO+ o Yogurade Natural sin azúcar añadida'},
+    {n:'Queso untable descremado',q:'',nt:'Tregar Blanco Light, Finlandia Más Liviano, CasanCrem o Tregar Ricotta Light'},
+    {n:'Queso cremoso magro (Port Salut)',q:'',nt:'La Paulina 10% Equilibrio, La Serenísima Port Salut o Tregar Port Salut Light'},
+  ]},
+  {cat:'🌾 Panificados y cereales — desayuno/merienda',items:[
+    {n:'Pan integral',q:'',nt:'Val Maira Integral Total o Macrobiótica Multicereal'},
+    {n:'Galletas de arroz',q:'',nt:'Dos Hermanos saladas extra finas'},
+    {n:'Avena instantánea',q:'',nt:'Quaker Avena Integral o Gronix Avena — cantidad diaria <span class="bc-who bc-w-pend">⚠️ CONFIRMAR</span>'},
+  ]},
+  {cat:'🍚 Carbohidratos cocidos — 3x/semana',items:[
+    {n:'Fideos integrales',q:'',nt:'Matarazzo Integral (doble fibra), Lucchetti 3 Vegetales o Gallo Integral Selectos'},
+    {n:'Fideos de legumbre',q:'',nt:'Legume Pasta de Lenteja'},
+    {n:'Arroz integral',q:'',nt:'Gallo Especialidades Yamaní'},
+    {n:'Tapa para tarta',q:'',nt:'La Salteña Balance'},
+  ]},
+  {cat:'🫒 Aceites',items:[
+    {n:'Aceite de girasol',q:'',nt:'Natura'},
+    {n:'Aceite de oliva virgen extra',q:'',nt:'Marca no legible en el PDF (etiqueta roja y negra) <span class="bc-who bc-w-pend">⚠️ CONFIRMAR</span>'},
+    {n:'Aceite de chía Omega 3',q:'',nt:'Aprox. "Nutri Sur" — nombre no 100% legible <span class="bc-who bc-w-pend">⚠️ CONFIRMAR</span>'},
+    {n:'Aceite de sésamo tostado',q:'',nt:'Mismo fabricante que el de chía'},
+  ]},
+  {cat:'🥩 Carnicería / Pescadería',items:[
+    {n:'Pechuga de pollo',q:''},
+    {n:'Carne vacuna magra',q:'',nt:'lomo, peceto, solomillo, carré o bife — alternar variedades'},
+    {n:'Merluza',q:'',nt:'filet'},
+    {n:'Salmón',q:''},
+    {n:'Atún al natural',q:'',nt:'lata'},
+  ]},
+  {cat:'🥦 Verdulería',items:[
+    {n:'Palta',q:'',nt:'3x/semana, ~¼ palta por vez <span class="bc-who bc-w-pend">⚠️ CONFIRMAR</span>'},
+    {n:'Fruta de estación',q:'',nt:'3 unidades/día o 1 taza trozada'},
+    {n:'Brócoli',q:''},
+    {n:'Zanahoria',q:''},
+    {n:'Zapallito / calabaza',q:''},
+    {n:'Morrón',q:''},
+    {n:'Cebolla',q:''},
+    {n:'Espinaca',q:''},
+    {n:'Acelga',q:''},
+    {n:'Lechuga / rúcula',q:''},
+    {n:'Tomate',q:''},
+    {n:'Pepino',q:''},
+    {n:'Rabanito',q:''},
+    {n:'Brotes',q:''},
+    {n:'Papa / batata / choclo',q:'',nt:'máx. 1 por día'},
+  ]},
+  {cat:'🫘 Almacén — legumbres, huevos, infusiones',items:[
+    {n:'Garbanzos',q:''},
+    {n:'Lentejas',q:''},
+    {n:'Huevos',q:'',nt:'2 enteros + 2 claras por día'},
+    {n:'Frutos secos',q:'',nt:'almendras, nueces — 10g/día'},
+    {n:'Condimentos',q:'',nt:'libres — los que más gusten'},
+    {n:'Café no torrado',q:''},
+    {n:'Té verde',q:''},
+    {n:'Manzanilla',q:''},
+    {n:'Edulcorante',q:'',nt:'para infusiones amargas, medido'},
+  ]},
+  {cat:'💧 Bebidas',items:[
+    {n:'Agua',q:''},
+    {n:'Soda',q:''},
+    {n:'Jugos naturales de fruta',q:'',nt:'exprimidos, no envasados'},
+  ]},
+  {cat:'🧒 Extra — recetas de Cata',items:[
+    {n:'Polvo de hornear',q:'',nt:'muffins, budines'},
+    {n:'Manteca de maní',q:'',nt:'bolitas de avena'},
+    {n:'Cacao amargo',q:'',nt:'opcional en muffins y bolitas'},
+    {n:'Queso rallado',q:'',nt:'tortillitas y croquetas'},
+  ]},
+];
+
+let ck={};
+try{ck=JSON.parse(localStorage.getItem('shopReset6')||'{}');}catch(e){}
+
+function buildShop(){
+  const c=document.getElementById('shop-cats'); c.innerHTML='';
+  shopData.forEach((cat,ci)=>{
+    const b=document.createElement('div'); b.className='shop-cat';
+    b.innerHTML=`<div class="shop-hd">${cat.cat}</div>`;
+    cat.items.forEach((item,ii)=>{
+      const k=`${ci}-${ii}`, d=document.createElement('div');
+      d.className='si'+(ck[k]?' ck':'');
+      const share = item.sh?'<span class="si-sh">👨‍👧</span>':'';
+      const note = item.nt?`<div class="si-nt">${item.nt}</div>`:'';
+      const qtxt = item.q?`<span class="si-q">${item.q}</span>`:'';
+      d.innerHTML=`<div class="si-main"><div class="si-top"><span class="si-n">${item.n}</span>${share}</div>${note}</div>${qtxt}<div class="si-chk">${ck[k]?'✓':''}</div>`;
+      d.onclick=()=>{ck[k]=!ck[k];try{localStorage.setItem('shopReset6',JSON.stringify(ck));}catch(e){}buildShop();};
+      b.appendChild(d);
+    });
+    c.appendChild(b);
+  });
+}
+function resetShop(){ck={};try{localStorage.setItem('shopReset6','{}');}catch(e){}buildShop();}
+buildShop();
+
+// ── BATCH COOKING ──
+const bcSteps = [
+  {t:'Prender horno 180°. Asadera de vegetales: calabaza, zanahoria, zucchini, batata', m:'35 min de horno', w:'both'},
+  {t:'Olla grande: arroz', m:'20 min', w:'both'},
+  {t:'Olla 2: hervir 2–3 pechugas', m:'20 min', w:'both'},
+  {t:'Olla 3: hervir 8–10 huevos', m:'12 min', w:'fede'},
+  {t:'Mientras tanto: salsa de tomate base', m:'15 min', w:'both'},
+  {t:'Marinar 3–4 pechugas crudas y freezar', m:'5 min', w:'fede'},
+  {t:'Segunda tanda de horno: muffins de avena + tortilla de calabaza', m:'25 min', w:'both'},
+  {t:'Desmenuzar pollo, mezclar con salsa, armar albóndigas o croquetas', m:'15 min', w:'nena'},
+  {t:'Porcionar todo, enfriar y freezar', m:'15 min', w:'both'}
+];
+const bcLbl = {both:'AMBOS', fede:'FEDE', nena:'NENA'};
+
+let bcDone = {};
+try{ bcDone = JSON.parse(localStorage.getItem('batchV1')||'{}'); }catch(e){}
+
+function bcRender(){
+  const c = document.getElementById('bc-steps');
+  c.innerHTML = bcSteps.map((s,i)=>
+    `<div class="bc-step${bcDone[i]?' dn':''}" onclick="bcTick(${i})">
+      <div class="bc-chk">${bcDone[i]?'✓':''}</div>
+      <div class="bc-stx">${s.t}<span class="bc-who bc-w-${s.w}">${bcLbl[s.w]}</span></div>
+      <div class="bc-stm">${s.m}</div>
+    </div>`).join('');
+}
+function bcTick(i){
+  bcDone[i] = !bcDone[i];
+  try{ localStorage.setItem('batchV1', JSON.stringify(bcDone)); }catch(e){}
+  bcRender();
+}
+function bcReset(){
+  bcDone = {};
+  try{ localStorage.setItem('batchV1','{}'); }catch(e){}
+  bcRender();
+}
+function bcView(v){
+  document.getElementById('bc-v-fede').classList.toggle('on', v==='fede');
+  document.getElementById('bc-v-nena').classList.toggle('on', v==='nena');
+  document.getElementById('bc-tg-fede').classList.toggle('on', v==='fede');
+  document.getElementById('bc-tg-nena').classList.toggle('on', v==='nena');
+}
+function bcTog(id){ document.getElementById(id).classList.toggle('op'); }
+bcRender();
+</script>
