@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f7a53">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Plan Reset">
+<title>Plan Reset</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<style>
+:root {
+  --bg: #f4f1ea;
+  --card: #ffffff;
+  --card2: #fbf6ea;
+  --text: #1f2a24;
+  --text-dim: #6b7a71;
+  --accent: #2f7a53;
+  --accent-soft: #e4f1e9;
+  --track: #e7e3d8;
+  --warn: #c1483a;
+  --border: #e6e2d6;
+  --nav: 66px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+  box-sizing: border-box;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #171b18; --card: #202620; --card2: #232920; --text: #eef1ec; --text-dim: #9aa79f;
+    --accent: #6fcf97; --accent-soft: #223328; --track: #2c332c;
+    --warn: #e5766a; --border: #2c332c;
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+}
+#app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; background: var(--bg); position: relative; }
+
+/* HEADER */
+.hdr { flex-shrink: 0; background: var(--card); border-bottom: 1px solid var(--border); padding: 13px 18px; padding-top: calc(13px + var(--safe-t)); }
+.hdr-title { font-size: 15px; font-weight: 700; text-align: center; color: var(--accent); letter-spacing: .02em; }
+
+/* BODY */
+.body { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding: 16px 16px 0; }
+.screen { display: none; padding-bottom: calc(var(--nav) + 24px); }
+.screen.active { display: block; }
+
+/* NAV */
+.nav { position: absolute; bottom: 0; left: 0; right: 0; height: calc(var(--nav) + var(--safe-b)); background: var(--card); border-top: 1px solid var(--border); display: flex; align-items: flex-start; padding-top: 8px; z-index: 100; }
+.ni { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 3px 0; }
+.ni-ic { font-size: 19px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 7px; transition: background .2s; }
+.ni-lb { font-size: 10px; font-weight: 600; color: var(--text-dim); letter-spacing: .3px; transition: color .2s; }
+.ni.on .ni-ic { background: var(--accent-soft); }
+.ni.on .ni-lb { color: var(--accent); }
+
+/* SHARED */
+h2 { font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--text-dim); margin: 4px 4px 8px; font-weight: 700; }
+h2:not(:first-child) { margin-top: 22px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; margin-bottom: 8px; overflow: hidden; }
+.note { font-size: 11.5px; color: var(--text-dim); line-height: 1.5; padding: 0 4px; margin: 8px 0; }
+.note b { color: var(--warn); font-weight: 600; }
+.pend { display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 5px; margin-left: 6px; vertical-align: middle; background: var(--accent-soft); color: var(--warn); }
+
+/* ── SALDO ── */
+.day-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 12px; }
+.day-nav button { background: var(--card); border: 1px solid var(--border); color: var(--text); border-radius: 10px; width: 40px; height: 40px; font-size: 18px; flex: none; }
+.day-label { text-align: center; flex: 1; }
+.day-label .dow { font-size: 17px; font-weight: 700; text-transform: capitalize; }
+.day-label .today-tag { font-size: 11.5px; color: var(--accent); font-weight: 600; }
+.day-label .date { font-size: 12.5px; color: var(--text-dim); }
+h3.grp { display: flex; align-items: baseline; gap: 8px; font-size: 14px; font-weight: 700; color: var(--text); margin: 16px 4px 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.row-top { display: flex; align-items: center; gap: 8px; }
+.emoji { font-size: 20px; width: 26px; text-align: center; }
+.label { flex: 1; font-size: 14px; font-weight: 600; line-height: 1.25; }
+.label small { display: block; font-weight: 400; color: var(--text-dim); font-size: 11px; }
+.amount { font-size: 13.5px; font-weight: 700; min-width: 72px; text-align: right; cursor: pointer; border-bottom: 1px dashed var(--text-dim); }
+.amount.over { color: var(--warn); }
+.amount input { width: 50px; font-size: 13.5px; font-weight: 700; text-align: right; background: transparent; border: none; border-bottom: 1px solid var(--accent); color: var(--text); }
+.stepper { display: flex; gap: 6px; margin-left: 4px; }
+.stepper button { width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--border); background: var(--accent-soft); color: var(--accent); font-size: 15px; font-weight: 700; line-height: 1; }
+.stepper button:active { transform: scale(.94); }
+.track { height: 6px; background: var(--track); border-radius: 4px; margin-top: 8px; overflow: hidden; }
+.fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width .15s ease; }
+.fill.over { background: var(--warn); }
+.weekly .card { background: var(--card2); }
+.actions { display: flex; gap: 8px; margin-top: 18px; }
+.actions button { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text-dim); font-size: 13px; }
+
+/* ── MENÚ ── */
+.mn-row { display: flex; gap: 10px; padding: 10px 13px; border-bottom: 1px solid var(--border); align-items: flex-start; }
+.mn-row:last-child { border-bottom: none; }
+.mn-day { flex-shrink: 0; width: 88px; font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--text-dim); padding-top: 2px; }
+.mn-tx { flex: 1; font-size: 13px; color: var(--text); line-height: 1.45; }
+.mn-free { flex: 1; font-size: 13px; color: var(--accent); font-weight: 700; }
+
+/* ── GUÍA ── */
+.eq-row { display: flex; padding: 9px 13px; border-bottom: 1px solid var(--border); gap: 8px; align-items: flex-start; }
+.eq-row:last-child { border-bottom: none; }
+.eq-g { flex: 1.25; font-size: 13px; color: var(--text); line-height: 1.4; }
+.eq-q { flex: 1; font-size: 12.5px; color: var(--accent); font-weight: 700; line-height: 1.4; text-align: right; }
+
+/* ── COMPRAS ── */
+.shop-hd { padding: 10px 14px; margin: -12px -14px 8px; background: var(--card2); font-size: 13px; font-weight: 700; border-bottom: 1px solid var(--border); border-radius: 14px 14px 0 0; }
+.si { padding: 10px 0; font-size: 14px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; cursor: pointer; user-select: none; gap: 8px; }
+.si:last-child { border-bottom: none; }
+.si.ck { opacity: .4; }
+.si.ck .si-n { text-decoration: line-through; }
+.si-main { flex: 1; min-width: 0; }
+.si-n { font-size: 14px; }
+.si-nt { font-size: 11px; color: var(--text-dim); font-style: italic; line-height: 1.4; margin-top: 3px; }
+.si-chk { width: 21px; height: 21px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 10px; color: transparent; transition: all .2s; flex-shrink: 0; margin-top: 1px; }
+.si.ck .si-chk { background: var(--accent); border-color: var(--accent); color: #fff; }
+.reset-btn { margin: 6px 0 4px; width: 100%; padding: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; font-size: 13px; font-weight: 600; color: var(--text-dim); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="hdr"><div class="hdr-title">Plan Reset</div></div>
+
+  <div class="body">
+
+    <!-- ══ SALDO ══ -->
+    <div class="screen active" id="sc-saldo">
+      <div class="day-nav">
+        <button id="prevDay" aria-label="Día anterior">‹</button>
+        <div class="day-label">
+          <div class="dow" id="dowLabel">—</div>
+          <div class="date" id="dateLabel">—</div>
+          <div class="today-tag" id="todayTag"></div>
+        </div>
+        <button id="nextDay" aria-label="Día siguiente">›</button>
+      </div>
+
+      <h2>Saldo de hoy</h2>
+      <h3 class="grp">Desayuno y merienda</h3>
+      <div id="listaDesayuno"></div>
+      <h3 class="grp">Almuerzo y cena</h3>
+      <div id="listaAlmuerzo"></div>
+      <h3 class="grp">En cualquier comida</h3>
+      <div id="listaOtros"></div>
+
+      <h2>Saldo de la semana</h2>
+      <div class="weekly" id="weeklyList"></div>
+      <p class="note">Palta en desayuno o merienda · carbohidrato cocido en almuerzo o cena · comidas libres, cuando quieras.</p>
+
+      <div class="actions">
+        <button id="resetDay">Reiniciar día</button>
+        <button id="resetWeek">Reiniciar semana</button>
+      </div>
+      <p class="note">Topes en unidades de cocina (porciones, tazas, cucharadas), sin balanza. Tocá + / − para registrar, o tocá el número para un valor exacto (admite medios). Se guarda en este dispositivo.</p>
+    </div>
+
+    <!-- ══ MENÚ ══ -->
+    <div class="screen" id="sc-menu">
+      <h2>☕ Desayuno</h2>
+      <div class="card">
+        <div class="mn-row"><div class="mn-day">Lun</div><div class="mn-tx">Café c/leche + 2 rebanadas de pan integral + 4 cditas de queso untable + ¼ palta</div></div>
+        <div class="mn-row"><div class="mn-day">Mar · Jue · Sáb · Dom</div><div class="mn-tx">Yogur descremado grande + 1 fruta + frutos secos</div></div>
+        <div class="mn-row"><div class="mn-day">Mié</div><div class="mn-tx">3 tostadas de arroz con queso untable y huevo + café con leche</div></div>
+        <div class="mn-row"><div class="mn-day">Vie</div><div class="mn-tx">Panqueque de avena salado + queso port salut + palta + cherrys</div></div>
+      </div>
+
+      <h2>🍴 Almuerzo</h2>
+      <div class="card">
+        <div class="mn-row"><div class="mn-day">Lun</div><div class="mn-tx">Wok de arroz integral (¼ plato) + pechuga de pollo + cebolla, morrón y brócoli gratinados</div></div>
+        <div class="mn-row"><div class="mn-day">Mar</div><div class="mn-tx">Tortilla de papa y espinaca con cebolla y queso port salut + ensalada</div></div>
+        <div class="mn-row"><div class="mn-day">Mié</div><div class="mn-tx">2 rapiditas integrales de verdura y atún</div></div>
+        <div class="mn-row"><div class="mn-day">Jue</div><div class="mn-tx">2 porciones de tarta tapa simple de verduras + ensalada</div></div>
+        <div class="mn-row"><div class="mn-day">Vie</div><div class="mn-tx">2 milanesas de pollo + ensalada</div></div>
+        <div class="mn-row"><div class="mn-day">Sáb</div><div class="mn-tx">Ensalada Caesar</div></div>
+        <div class="mn-row"><div class="mn-day">Dom</div><div class="mn-free">Libre</div></div>
+      </div>
+
+      <h2>🧉 Merienda</h2>
+      <div class="card">
+        <div class="mn-row"><div class="mn-day">Lun · Mié · Vie</div><div class="mn-tx">Yogur descremado grande + 1 fruta + frutos secos</div></div>
+        <div class="mn-row"><div class="mn-day">Mar</div><div class="mn-tx">Tostado integral con queso port salut, huevo, cherrys, rúcula y palta + café con leche</div></div>
+        <div class="mn-row"><div class="mn-day">Jue</div><div class="mn-tx">2 panqueques de avena y banana + fruta + café con leche</div></div>
+        <div class="mn-row"><div class="mn-day">Sáb</div><div class="mn-tx">Café c/leche + 2 rebanadas de pan integral + 4 cditas de queso untable + ¼ palta</div></div>
+        <div class="mn-row"><div class="mn-day">Dom</div><div class="mn-free">Libre</div></div>
+      </div>
+
+      <h2>🌙 Cena</h2>
+      <div class="card">
+        <div class="mn-row"><div class="mn-day">Lun</div><div class="mn-tx">Pastel de pollo y calabaza con queso port salut</div></div>
+        <div class="mn-row"><div class="mn-day">Mar</div><div class="mn-tx">Churrasco magro + ensalada</div></div>
+        <div class="mn-row"><div class="mn-day">Mié</div><div class="mn-tx">2 filet de merluza con queso port salut + ensalada</div></div>
+        <div class="mn-row"><div class="mn-day">Jue</div><div class="mn-tx">Wok de solomillo y verduras + ensalada</div></div>
+        <div class="mn-row"><div class="mn-day">Vie</div><div class="mn-tx">Pollo al horno + papa, batata, morrón y cebolla</div></div>
+        <div class="mn-row"><div class="mn-day">Sáb</div><div class="mn-free">Libre</div></div>
+        <div class="mn-row"><div class="mn-day">Dom</div><div class="mn-tx">Carne al horno con vegetales + ensalada</div></div>
+      </div>
+    </div>
+
+    <!-- ══ COMPRAS ══ -->
+    <div class="screen" id="sc-shop">
+      <div id="shop-cats"></div>
+      <button class="reset-btn" onclick="resetShop()">↺ Reiniciar lista</button>
+    </div>
+
+    <!-- ══ GUÍA ══ -->
+    <div class="screen" id="sc-guia">
+      <h2>Desayuno &amp; merienda · por día</h2>
+      <div class="card">
+        <div class="eq-row"><div class="eq-g">Leche descremada</div><div class="eq-q">200 ml</div></div>
+        <div class="eq-row"><div class="eq-g">Yogur descremado</div><div class="eq-q">200 ml</div></div>
+        <div class="eq-row"><div class="eq-g">Queso untable</div><div class="eq-q">4 cditas</div></div>
+        <div class="eq-row"><div class="eq-g">Queso cremoso magro</div><div class="eq-q">60 g</div></div>
+        <div class="eq-row"><div class="eq-g">Frutas</div><div class="eq-q">3 u.</div></div>
+        <div class="eq-row"><div class="eq-g">Huevos</div><div class="eq-q">2 + 2 claras</div></div>
+        <div class="eq-row"><div class="eq-g">Frutos secos</div><div class="eq-q">10 g</div></div>
+        <div class="eq-row"><div class="eq-g">Palta</div><div class="eq-q">3x/semana<span class="pend">?</span></div></div>
+        <div class="eq-row"><div class="eq-g">Carbohidrato · elegí 1</div><div class="eq-q">pan 50 g · 3 galletas de arroz · avena<span class="pend">?</span></div></div>
+      </div>
+
+      <h2>Almuerzo &amp; cena · por día</h2>
+      <div class="card">
+        <div class="eq-row"><div class="eq-g">Carnes magras</div><div class="eq-q">200 g</div></div>
+        <div class="eq-row"><div class="eq-g">Vegetales</div><div class="eq-q">400 g</div></div>
+        <div class="eq-row"><div class="eq-g">Papa · choclo · batata</div><div class="eq-q">máx. 1</div></div>
+        <div class="eq-row"><div class="eq-g">Legumbres</div><div class="eq-q">3 cdas</div></div>
+        <div class="eq-row"><div class="eq-g">Carbohidrato cocido</div><div class="eq-q">80 g · 3x/semana</div></div>
+        <div class="eq-row"><div class="eq-g">Aceites</div><div class="eq-q">2 cdas</div></div>
+      </div>
+
+      <p class="note"><b>Carnes:</b> lomo, peceto, solomillo, pechuga, carré, merluza, atún al natural, bife, salmón.</p>
+      <p class="note"><b>Carbohidrato cocido:</b> integral, con vegetales, preferentemente en el almuerzo. Nunca se elimina. Equivale a 2 empanadas, 2 porciones de pizza o 2 de tarta.</p>
+
+      <h2>Libres</h2>
+      <div class="card">
+        <div class="eq-row"><div class="eq-g">Condimentos</div><div class="eq-q">a gusto</div></div>
+        <div class="eq-row"><div class="eq-g">Infusiones</div><div class="eq-q">amargas</div></div>
+        <div class="eq-row"><div class="eq-g">Agua · soda · jugo natural</div><div class="eq-q">sin límite</div></div>
+      </div>
+      <p class="note"><b>Evitar:</b> gaseosas y jugos envasados.</p>
+
+      <h2>A confirmar<span class="pend">?</span></h2>
+      <p class="note">Cantidad de avena (el PDF dice "1/taza", sin número) y cantidad de palta por vez.</p>
+    </div>
+
+  </div><!-- body -->
+
+  <nav class="nav">
+    <div class="ni on" onclick="showScreen('saldo',this)"><div class="ni-ic">⚖️</div><div class="ni-lb">Saldo</div></div>
+    <div class="ni" onclick="showScreen('menu',this)"><div class="ni-ic">🍽️</div><div class="ni-lb">Menú</div></div>
+    <div class="ni" onclick="showScreen('shop',this)"><div class="ni-ic">🛒</div><div class="ni-lb">Compras</div></div>
+    <div class="ni" onclick="showScreen('guia',this)"><div class="ni-ic">📋</div><div class="ni-lb">Guía</div></div>
+  </nav>
+
+</div>
+
+<script>
+/* ---------- Service worker ---------- */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(e){ console.error('SW:', e); });
+  });
+}
+
+/* ---------- Tabs ---------- */
+function showScreen(n, el) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.ni').forEach(function(i){ i.classList.remove('on'); });
+  document.getElementById('sc-' + n).classList.add('active');
+  el.classList.add('on');
+  document.querySelector('.body').scrollTop = 0;
+}
+
+/* ---------- Saldo ---------- */
+(function(){
+  // Los topes son diarios, no por comida: los grupos siguen cómo los ordena el plan,
+  // y cada uno se puede repartir libremente entre desayuno y merienda, o entre almuerzo y cena.
+  var DESAYUNO = [
+    {id:'leche', label:'Leche descremada', sub:'', emoji:'🥛', unit:'taza', cap:1, step:0.5},
+    {id:'yogur', label:'Yogur descremado', sub:'', emoji:'🥣', unit:'pote grande', cap:1, step:0.5},
+    {id:'quesoUntable', label:'Queso untable', sub:'', emoji:'🧈', unit:'cdita', cap:4, step:1},
+    {id:'quesoCremoso', label:'Queso cremoso magro', sub:'port salut', emoji:'🧀', unit:'rebanada', cap:2, step:1},
+    {id:'pan', label:'Pan integral', sub:'', emoji:'🍞', unit:'rebanada', cap:2, step:1},
+    {id:'galletasArroz', label:'Galletas de arroz', sub:'', emoji:'🍘', unit:'u', cap:3, step:1},
+    {id:'avena', label:'Avena', sub:'cantidad sin definir en el plan', emoji:'🥣', unit:'porción', cap:1, step:1},
+    {id:'frutas', label:'Frutas', sub:'', emoji:'🍎', unit:'u', cap:3, step:1},
+    {id:'huevo', label:'Huevo entero', sub:'', emoji:'🥚', unit:'u', cap:2, step:1},
+    {id:'clara', label:'Clara de huevo', sub:'', emoji:'🍳', unit:'u', cap:2, step:1},
+    {id:'frutosSecos', label:'Frutos secos', sub:'10 almendras o 5 nueces = 1 porción', emoji:'🥜', unit:'porción', cap:1, step:1}
+  ];
+  var ALMUERZO = [
+    {id:'carne', label:'Carnes magras', sub:'1 porción ≈ 1 milanesa, 1 filet o medio churrasco', emoji:'🥩', unit:'porción', cap:2, step:1},
+    {id:'vegetales', label:'Vegetales', sub:'1 porción chica (o 3 porciones en vez de 4 si son grandes)', emoji:'🥦', unit:'porción', cap:4, step:1},
+    {id:'papa', label:'Papa / batata / choclo', sub:'máximo 1 por día', emoji:'🥔', unit:'u', cap:1, step:1},
+    {id:'legumbres', label:'Legumbres', sub:'en ensaladas', emoji:'🫘', unit:'cda', cap:3, step:1}
+  ];
+  var OTROS = [
+    {id:'aceite', label:'Aceite', sub:'total del día, para todas las comidas', emoji:'🫒', unit:'cda', cap:2, step:1}
+  ];
+  var WEEKLY = [
+    {id:'carbCocido', label:'Carbohidrato cocido', sub:'1/4 plato de arroz/fideos/quinoa/polenta, o 2 empanadas/pizza/tarta · solo 3x/semana', emoji:'🍝', unit:'porción', cap:3, step:1},
+    {id:'palta', label:'Palta', sub:'según el menú de ejemplo ≈1/4 por vez · 3x/semana', emoji:'🥑', unit:'porción', cap:3, step:1},
+    {id:'libre', label:'Comidas libres', sub:'referencia del menú: 3/semana, elegís cuándo', emoji:'🎉', unit:'uso', cap:3, step:1}
+  ];
+
+  var DOW = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  var MONTHS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  var currentDate = new Date();
+  currentDate.setHours(0,0,0,0);
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function dateKey(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+  function isoWeekKey(d){
+    var date = new Date(d.getTime());
+    date.setHours(0,0,0,0);
+    date.setDate(date.getDate() + 3 - ((date.getDay()+6)%7));
+    var week1 = new Date(date.getFullYear(),0,4);
+    var weekNo = 1 + Math.round(((date - week1) / 86400000 - 3 + ((week1.getDay()+6)%7))/7);
+    return date.getFullYear()+'-W'+pad(weekNo);
+  }
+  function sameDay(a,b){ return dateKey(a)===dateKey(b); }
+  function fmt(n){
+    if (n == null || isNaN(n)) n = 0;
+    var whole = Math.floor(n);
+    var frac = Math.round((n - whole) * 100) / 100;
+    if (frac === 0) return String(whole);
+    if (frac === 0.5) return (whole > 0 ? whole : '') + '½';
+    return String(n);
+  }
+  function safeGet(key){
+    try { var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : {}; }
+    catch(e){ return {}; }
+  }
+  function safeSet(key, obj){ try { localStorage.setItem(key, JSON.stringify(obj)); } catch(e){} }
+  function loadDaily(){ return safeGet('plan-alim:v1:dia:'+dateKey(currentDate)); }
+  function saveDaily(state){ safeSet('plan-alim:v1:dia:'+dateKey(currentDate), state); }
+  function loadWeekly(){ return safeGet('plan-alim:v1:semana:'+isoWeekKey(currentDate)); }
+  function saveWeekly(state){ safeSet('plan-alim:v1:semana:'+isoWeekKey(currentDate), state); }
+
+  function renderHeader(){
+    document.getElementById('dowLabel').textContent = DOW[currentDate.getDay()];
+    document.getElementById('dateLabel').textContent = currentDate.getDate()+' de '+MONTHS[currentDate.getMonth()];
+    var today = new Date(); today.setHours(0,0,0,0);
+    document.getElementById('todayTag').textContent = sameDay(currentDate, today) ? 'Hoy' : '';
+  }
+
+  function buildList(containerId, items, state, saveFn){
+    var container = document.getElementById(containerId);
+    container.innerHTML = '';
+    items.forEach(function(cat){
+      var used = state[cat.id] || 0;
+      var card = document.createElement('div');
+      card.className = 'card';
+
+      var top = document.createElement('div');
+      top.className = 'row-top';
+
+      var emoji = document.createElement('div');
+      emoji.className = 'emoji';
+      emoji.textContent = cat.emoji;
+
+      var label = document.createElement('div');
+      label.className = 'label';
+      label.innerHTML = cat.label + (cat.sub ? '<small>'+cat.sub+'</small>' : '');
+
+      var amount = document.createElement('div');
+      amount.className = 'amount' + (used > cat.cap ? ' over' : '');
+      amount.textContent = fmt(used) + '/' + fmt(cat.cap) + ' ' + cat.unit;
+      amount.title = 'Tocá para escribir un valor exacto';
+      amount.addEventListener('click', function(){
+        if (amount.querySelector('input')) return;
+        var input = document.createElement('input');
+        input.type = 'number';
+        input.step = '0.5';
+        input.value = state[cat.id] || 0;
+        input.min = '0';
+        amount.textContent = '';
+        amount.appendChild(input);
+        input.focus();
+        input.select();
+        function commit(){
+          var v = parseFloat(input.value);
+          if (isNaN(v) || v < 0) v = 0;
+          state[cat.id] = v;
+          saveFn(state);
+          refreshRow();
+        }
+        input.addEventListener('blur', commit);
+        input.addEventListener('keydown', function(e){ if(e.key==='Enter'){ input.blur(); } });
+      });
+
+      var stepper = document.createElement('div');
+      stepper.className = 'stepper';
+      var minus = document.createElement('button');
+      minus.textContent = '−';
+      minus.addEventListener('click', function(){
+        state[cat.id] = Math.max(0, (state[cat.id]||0) - cat.step);
+        saveFn(state);
+        refreshRow();
+      });
+      var plus = document.createElement('button');
+      plus.textContent = '+';
+      plus.addEventListener('click', function(){
+        state[cat.id] = (state[cat.id]||0) + cat.step;
+        saveFn(state);
+        refreshRow();
+      });
+      stepper.appendChild(minus);
+      stepper.appendChild(plus);
+
+      top.appendChild(emoji);
+      top.appendChild(label);
+      top.appendChild(amount);
+      top.appendChild(stepper);
+
+      var track = document.createElement('div');
+      track.className = 'track';
+      var fill = document.createElement('div');
+      fill.className = 'fill';
+      track.appendChild(fill);
+
+      card.appendChild(top);
+      card.appendChild(track);
+      container.appendChild(card);
+
+      function refreshRow(){
+        var u = state[cat.id] || 0;
+        var pct = Math.min(100, (u / cat.cap) * 100);
+        fill.style.width = pct + '%';
+        fill.className = 'fill' + (u > cat.cap ? ' over' : '');
+        amount.className = 'amount' + (u > cat.cap ? ' over' : '');
+        amount.textContent = fmt(u) + '/' + fmt(cat.cap) + ' ' + cat.unit;
+      }
+      refreshRow();
+    });
+  }
+
+  function renderAll(){
+    renderHeader();
+    var daily = loadDaily(); // un solo objeto para las tres secciones: mismo día, misma key
+    buildList('listaDesayuno', DESAYUNO, daily, saveDaily);
+    buildList('listaAlmuerzo', ALMUERZO, daily, saveDaily);
+    buildList('listaOtros', OTROS, daily, saveDaily);
+    buildList('weeklyList', WEEKLY, loadWeekly(), saveWeekly);
+  }
+
+  document.getElementById('prevDay').addEventListener('click', function(){ currentDate.setDate(currentDate.getDate()-1); renderAll(); });
+  document.getElementById('nextDay').addEventListener('click', function(){ currentDate.setDate(currentDate.getDate()+1); renderAll(); });
+  document.getElementById('resetDay').addEventListener('click', function(){
+    if (confirm('¿Reiniciar el saldo de este día?')) { saveDaily({}); renderAll(); }
+  });
+  document.getElementById('resetWeek').addEventListener('click', function(){
+    if (confirm('¿Reiniciar el saldo de esta semana?')) { saveWeekly({}); renderAll(); }
+  });
+
+  renderAll();
+
+  var lastToday = dateKey(new Date());
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState !== 'visible') return;
+    var now = new Date();
+    if (dateKey(now) !== lastToday) {
+      lastToday = dateKey(now);
+      currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      renderAll();
+    }
+  });
+})();
+
+/* ---------- Compras ---------- */
+var shopData = [
+  {cat:'🥛 Lácteos', items:[
+    {n:'Leche descremada', nt:'La Serenísima (Leche Fresca Liviana / Protein 46g / Menos Calorías 0% / Reducida en Lactosa) o Las Tres Niñas Vida Activa Proteína'},
+    {n:'Yogur descremado', nt:'Tregar Natural sin azúcar, Dahi Firme Descremado Natural, Ser Natural, Yogurísimo, Ser PRO+ o Yogurade Natural sin azúcar añadida'},
+    {n:'Queso untable descremado', nt:'Tregar Blanco Light, Finlandia Más Liviano, CasanCrem o Tregar Ricotta Light'},
+    {n:'Queso cremoso magro (Port Salut)', nt:'La Paulina 10% Equilibrio, La Serenísima Port Salut o Tregar Port Salut Light'}
+  ]},
+  {cat:'🌾 Panificados y cereales — desayuno/merienda', items:[
+    {n:'Pan integral', nt:'Val Maira Integral Total o Macrobiótica Multicereal'},
+    {n:'Galletas de arroz', nt:'Dos Hermanos saladas extra finas'},
+    {n:'Avena instantánea', nt:'Quaker Avena Integral o Gronix Avena — cantidad diaria a confirmar ⚠️'}
+  ]},
+  {cat:'🍚 Carbohidratos cocidos — 3x/semana', items:[
+    {n:'Fideos integrales', nt:'Matarazzo Integral (doble fibra), Lucchetti 3 Vegetales o Gallo Integral Selectos'},
+    {n:'Fideos de legumbre', nt:'Legume Pasta de Lenteja'},
+    {n:'Arroz integral', nt:'Gallo Especialidades Yamaní'},
+    {n:'Tapa para tarta', nt:'La Salteña Balance'}
+  ]},
+  {cat:'🫒 Aceites', items:[
+    {n:'Aceite de girasol', nt:'Natura'},
+    {n:'Aceite de oliva virgen extra', nt:'Marca no legible en el PDF (etiqueta roja y negra) — a confirmar ⚠️'},
+    {n:'Aceite de chía Omega 3', nt:'Aprox. "Nutri Sur" — nombre no 100% legible ⚠️'},
+    {n:'Aceite de sésamo tostado', nt:'Mismo fabricante que el de chía'}
+  ]},
+  {cat:'🥩 Carnicería / Pescadería', items:[
+    {n:'Pechuga de pollo'},
+    {n:'Carne vacuna magra', nt:'lomo, peceto, solomillo, carré o bife — alternar variedades'},
+    {n:'Merluza', nt:'filet'},
+    {n:'Salmón'},
+    {n:'Atún al natural', nt:'lata'}
+  ]},
+  {cat:'🥦 Verdulería', items:[
+    {n:'Palta', nt:'3x/semana, ~¼ palta por vez — a confirmar ⚠️'},
+    {n:'Fruta de estación', nt:'3 unidades/día o 1 taza trozada'},
+    {n:'Brócoli'}, {n:'Zanahoria'}, {n:'Zapallito / calabaza'}, {n:'Morrón'}, {n:'Cebolla'},
+    {n:'Espinaca'}, {n:'Acelga'}, {n:'Lechuga / rúcula'}, {n:'Tomate'}, {n:'Pepino'}, {n:'Rabanito'}, {n:'Brotes'},
+    {n:'Papa / batata / choclo', nt:'máx. 1 por día'}
+  ]},
+  {cat:'🫘 Almacén — legumbres, huevos, infusiones', items:[
+    {n:'Garbanzos'}, {n:'Lentejas'},
+    {n:'Huevos', nt:'2 enteros + 2 claras por día'},
+    {n:'Frutos secos', nt:'almendras, nueces — 10g/día'},
+    {n:'Condimentos', nt:'libres — los que más gusten'},
+    {n:'Café no torrado'}, {n:'Té verde'}, {n:'Manzanilla'},
+    {n:'Edulcorante', nt:'para infusiones amargas, medido'}
+  ]},
+  {cat:'💧 Bebidas', items:[
+    {n:'Agua'}, {n:'Soda'}, {n:'Jugos naturales de fruta', nt:'exprimidos, no envasados'}
+  ]},
+  {cat:'🧒 Extra — recetas de Cata', items:[
+    {n:'Polvo de hornear', nt:'muffins, budines'},
+    {n:'Manteca de maní', nt:'bolitas de avena'},
+    {n:'Cacao amargo', nt:'opcional en muffins y bolitas'},
+    {n:'Queso rallado', nt:'tortillitas y croquetas'}
+  ]}
+];
+
+var ck = {};
+try { ck = JSON.parse(localStorage.getItem('shopReset6') || '{}'); } catch(e){}
+
+function buildShop(){
+  var c = document.getElementById('shop-cats');
+  c.innerHTML = '';
+  shopData.forEach(function(cat, ci){
+    var b = document.createElement('div');
+    b.className = 'card';
+    b.style.padding = '0';
+    var hd = document.createElement('div');
+    hd.className = 'shop-hd';
+    hd.textContent = cat.cat;
+    b.appendChild(hd);
+    var body = document.createElement('div');
+    body.style.padding = '0 14px';
+    cat.items.forEach(function(item, ii){
+      var k = ci + '-' + ii;
+      var d = document.createElement('div');
+      d.className = 'si' + (ck[k] ? ' ck' : '');
+      var note = item.nt ? '<div class="si-nt">' + item.nt + '</div>' : '';
+      d.innerHTML = '<div class="si-main"><div class="si-n">' + item.n + '</div>' + note + '</div><div class="si-chk">' + (ck[k] ? '✓' : '') + '</div>';
+      d.onclick = function(){
+        ck[k] = !ck[k];
+        try { localStorage.setItem('shopReset6', JSON.stringify(ck)); } catch(e){}
+        buildShop();
+      };
+      body.appendChild(d);
+    });
+    b.appendChild(body);
+    c.appendChild(b);
+  });
+}
+function resetShop(){
+  ck = {};
+  try { localStorage.setItem('shopReset6', '{}'); } catch(e){}
+  buildShop();
+}
+buildShop();
+</script>
+</body>
+</html>
